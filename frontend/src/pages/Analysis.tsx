@@ -64,7 +64,7 @@ export default function Analysis() {
 
     for (const outcome of outcomes) {
       if ("error" in outcome) {
-        errors[outcome.key] = outcome.error;
+        errors[outcome.key] = outcome.error ?? "Unknown error";
       } else {
         results[outcome.key] = outcome.result;
       }
