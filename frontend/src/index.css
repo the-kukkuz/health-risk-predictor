@@ -10,32 +10,75 @@ body,
 
 body {
   margin: 0;
-  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    Helvetica, Arial, sans-serif;
-  background-color: #f8fafc;
-  color: #0f172a;
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  background-color: #faf8ff;
+  color: #131b2e;
+  -webkit-font-smoothing: antialiased;
 }
 
-.card {
-  @apply bg-white rounded-xl border border-slate-200 shadow-sm p-6;
+/* Material Symbols icon helper */
+.icon {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  user-select: none;
 }
 
-.btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg bg-brand-600 px-4 py-2
-    text-sm font-medium text-white shadow-sm transition hover:bg-brand-700
-    disabled:opacity-50 disabled:cursor-not-allowed;
-}
+@layer components {
+  /* Primary content surface: white card on the slate canvas */
+  .card {
+    @apply bg-surface-container-lowest border border-outline-variant rounded-xl shadow-card;
+  }
 
-.input-field {
-  @apply block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm
-    shadow-sm focus:border-brand-500 focus:ring-1 focus:ring-brand-500
-    outline-none;
-}
+  /* Primary action button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary-container px-4 py-2
+      text-sm font-medium text-on-primary shadow-card transition hover:bg-primary
+      disabled:opacity-50 disabled:cursor-not-allowed;
+  }
 
-.label-field {
-  @apply block text-sm font-medium text-slate-700 mb-1;
-}
+  /* Secondary / outline button */
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-surface-container-lowest
+      border border-outline-variant px-4 py-2 text-sm font-medium text-on-surface
+      shadow-card transition hover:bg-surface-container-low disabled:opacity-50
+      disabled:cursor-not-allowed;
+  }
 
-.hint {
-  @apply mt-1 text-xs text-slate-500;
+  /* Text input */
+  .input-field {
+    @apply block w-full rounded-lg border border-outline-variant bg-surface-container-lowest
+      px-3 py-2 text-sm text-on-surface shadow-sm outline-none transition
+      focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-outline;
+  }
+
+  /* Select dropdown */
+  .select-field {
+    @apply block w-full rounded-lg border border-outline-variant bg-surface-container-lowest
+      px-3 py-2 text-sm text-on-surface shadow-sm outline-none transition appearance-none
+      focus:border-primary focus:ring-2 focus:ring-primary/20;
+  }
+
+  /* Field label */
+  .label-field {
+    @apply block text-label-md text-on-surface-variant mb-1;
+  }
+
+  /* Field hint / helper text */
+  .hint {
+    @apply mt-1 text-xs text-on-surface-variant;
+  }
+
+  /* Risk status chip */
+  .chip {
+    @apply inline-flex items-center justify-center px-2.5 py-0.5 rounded-full
+      text-label-md border;
+  }
 }
