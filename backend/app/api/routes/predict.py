@@ -17,6 +17,7 @@ from app.db.session import get_db
 from app.models.prediction import PredictionRecord
 from app.schemas.prediction import (
     DiabetesFeatures,
+    HeartFeatures,
     PredictionResponse,
 )
 from app.services.prediction_service import (
@@ -31,6 +32,7 @@ router = APIRouter(prefix="/api/v1/predict", tags=["predict"])
 # add its feature schema here. No other route logic needs to change.
 REQUEST_SCHEMAS = {
     "diabetes": DiabetesFeatures,
+    "heart": HeartFeatures,
 }
 
 

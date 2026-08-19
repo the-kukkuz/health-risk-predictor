@@ -1,76 +1,85 @@
-"""Heart-disease prediction service -- PLACEHOLDER / INTEGRATION STUB.
+"""Heart disease-specific prediction service.
 
-The heart ML pipeline is being developed independently. This stub implements
-the SAME `DiseasePredictionService` interface but deliberately returns
-`not_ready` (HTTP 503) instead of any prediction. It must NEVER fabricate
-probabilities, labels, or SHAP values.
-
-INTEGRATION INSTRUCTIONS (for the heart module developer)
----------------------------------------------------------
-Replace the body of this class (or provide a new implementation) with real
-inference, while keeping the interface identical:
-
-    1. Drop the trained artifact at  models/heart/heart_model.joblib
-       and metadata at  models/heart/metadata.json.
-    2. Implement predict(input_data) returning the common PredictionResponse
-       shape (disease="heart_disease").
-    3. Implement explain(input_data) returning list[Factor] via SHAP.
-    4. Implement get_model_metadata() returning ModelInfo(status="ready", ...).
-    5. No changes are needed to: routes, the registry wiring below, the
-       database schema, the React frontend, Docker, or Kubernetes.
-
-Expected predict() payload (same shape as diabetes):
-    {
-        "disease": "heart_disease",
-        "prediction": 0 | 1,
-        "probability": 0.XX,
-        "risk_band": "Low" | "Moderate" | "High",
-        "threshold": 0.XX,
-        "top_factors": [ {"feature","impact","direction"} ... ]
-    }
+Implements the common `DiseasePredictionService` interface using the singleton
+model bundle loaded at startup.
 """
 from __future__ import annotations
 
-from app.schemas.prediction import ModelInfo
+import logging
+
+from app.ml.heart.loader import get_bundle
+from app.schemas.prediction import Factor, ModelInfo, PredictionResponse
 from app.services.prediction_service import (
     DiseasePredictionService,
     ModuleNotReadyError,
 )
 
-NOT_READY_MESSAGE = (
-    "Heart disease prediction module is currently being integrated."
+logger = logging.getLogger(__name__)
+
+DISCLAIMER = (
+    "This system provides machine-learning-based risk stratification for "
+    "research and decision-support purposes. It is not a medical diagnostic "
+    "tool and should not be used as a substitute for professional medical "
+    "evaluation."
 )
 
-
 class HeartPredictionService(DiseasePredictionService):
-    disease = "heart_disease"
+    disease = "heart"
+
+    def __init__(self) -> None:
+        self._bundle = get_bundle()
 
     def is_ready(self) -> bool:
-        # When the real model is integrated, flip this to reflect load state.
-        return False
+        return bool(self._bundle.loaded and self._bundle.artifact is not None)
 
-    def predict(self, input_data: dict):
-        raise ModuleNotReadyError(self.disease, NOT_READY_MESSAGE)
+    def _require_ready(self) -> None:
+        if not self.is_ready():
+            raise ModuleNotReadyError(
+                self.disease,
+                self._bundle.error
+                or "Heart disease prediction module is not currently available.",
+            )
 
-    def explain(self, input_data: dict):
-        raise ModuleNotReadyError(self.disease, NOT_READY_MESSAGE)
+    def predict(self, input_data: dict) -> PredictionResponse:
+        self._require_ready()
+        result = self._bundle.predict(input_data)
+        factors = self._bundle.explain(input_data)
+        return PredictionResponse(
+            disease=self.disease,
+            prediction=result["prediction"],
+            probability=result["probability"],
+            risk_band=result["risk_band"],
+            threshold=result["threshold"],
+            top_factors=[Factor(**f) for f in factors],
+            model_version=self._bundle.artifact.get("model_version"),
+            disclaimer=DISCLAIMER,
+        )
+
+    def explain(self, input_data: dict) -> list[Factor]:
+        self._require_ready()
+        return [Factor(**f) for f in self._bundle.explain(input_data)]
 
     def get_model_metadata(self) -> ModelInfo:
-        # Metadata is intentionally available so the frontend/UI can show the
-        # module state without triggering a prediction. The service reports
-        # status="not_ready" and no metrics.
+        self._require_ready()
+        art = self._bundle.artifact
+        meta = self._bundle.metadata or {}
         return ModelInfo(
             disease=self.disease,
-            status="not_ready",
-            feature_names=[],
-            message=NOT_READY_MESSAGE,
+            status="ready",
+            model_name=art.get("model_name"),
+            model_version=art.get("model_version"),
+            selected_family=art.get("family"),
+            feature_names=list(art.get("feature_names", [])),
+            threshold=art.get("threshold"),
+            risk_bands=art.get("risk_bands"),
+            test_metrics=meta.get("test_metrics"),
+            validation_metrics=meta.get("validation_metrics", {}).get(art.get("family", ""), {}),
         )
 
     def statistics(self) -> dict:
-        # No heart analytics are fabricated. Return an explicit not_ready state
-        # that the frontend renders gracefully.
+        self._require_ready()
         return {
             "disease": self.disease,
-            "status": "not_ready",
-            "message": NOT_READY_MESSAGE,
+            "status": "ready",
+            "message": "Analytics not yet implemented for heart disease."
         }

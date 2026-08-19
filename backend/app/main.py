@@ -46,13 +46,22 @@ async def lifespan(app: FastAPI):
 
     # Eagerly load the diabetes model bundle so the first request is fast and
     # so readiness is deterministic.
-    from app.ml.diabetes.loader import get_bundle
+    from app.ml.diabetes.loader import get_bundle as get_diabetes_bundle
 
-    bundle = get_bundle()
-    if bundle.loaded:
+    diabetes_bundle = get_diabetes_bundle()
+    if diabetes_bundle.loaded:
         logger.info("Diabetes model loaded successfully at startup.")
     else:
-        logger.warning("Diabetes model NOT loaded: %s", bundle.error)
+        logger.warning("Diabetes model NOT loaded: %s", diabetes_bundle.error)
+
+    # Eagerly load the heart model bundle
+    from app.ml.heart.loader import get_bundle as get_heart_bundle
+
+    heart_bundle = get_heart_bundle()
+    if heart_bundle.loaded:
+        logger.info("Heart model loaded successfully at startup.")
+    else:
+        logger.warning("Heart model NOT loaded: %s", heart_bundle.error)
 
     # Create tables if they do not exist. (Alembic would replace this for
     # production schema migrations; create_all is sufficient for the MVP.)

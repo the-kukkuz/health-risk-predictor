@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Prediction History - Health Risk Predictor</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e2e7ff",
+                    "surface": "#faf8ff",
+                    "on-tertiary-fixed": "#002109",
+                    "on-secondary": "#ffffff",
+                    "on-primary-fixed": "#001551",
+                    "error": "#ba1a1a",
+                    "on-primary-container": "#cad3ff",
+                    "on-tertiary-fixed-variant": "#005320",
+                    "primary-container": "#1d4ed8",
+                    "on-surface": "#131b2e",
+                    "on-secondary-fixed": "#001d31",
+                    "on-primary-fixed-variant": "#0039b5",
+                    "secondary-container": "#5bb8fe",
+                    "surface-tint": "#2151da",
+                    "surface-bright": "#faf8ff",
+                    "tertiary-container": "#006b2c",
+                    "inverse-surface": "#283044",
+                    "secondary-fixed-dim": "#93ccff",
+                    "on-secondary-fixed-variant": "#004b73",
+                    "outline-variant": "#c4c5d7",
+                    "surface-container-low": "#f2f3ff",
+                    "on-error": "#ffffff",
+                    "surface-dim": "#d2d9f4",
+                    "secondary": "#006398",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "on-background": "#131b2e",
+                    "on-secondary-container": "#00476e",
+                    "surface-container-lowest": "#ffffff",
+                    "primary": "#0037b0",
+                    "background": "#faf8ff",
+                    "surface-container-highest": "#dae2fd",
+                    "on-surface-variant": "#434655",
+                    "surface-container": "#eaedff",
+                    "tertiary-fixed-dim": "#62df7d",
+                    "inverse-on-surface": "#eef0ff",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "on-tertiary": "#ffffff",
+                    "primary-fixed": "#dce1ff",
+                    "inverse-primary": "#b7c4ff",
+                    "outline": "#747686",
+                    "tertiary": "#00501f",
+                    "on-tertiary-container": "#71ee8a",
+                    "secondary-fixed": "#cce5ff",
+                    "surface-variant": "#dae2fd",
+                    "tertiary-fixed": "#7ffc97",
+                    "error-container": "#ffdad6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "max-width": "1280px",
+                    "base": "4px",
+                    "margin-desktop": "32px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "xl": "32px",
+                    "gutter": "24px",
+                    "sm": "8px",
+                    "md": "16px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter", "sans-serif"],
+                    "headline-md": ["Inter", "sans-serif"],
+                    "headline-lg-mobile": ["Inter", "sans-serif"],
+                    "headline-sm": ["Inter", "sans-serif"],
+                    "headline-lg": ["Inter", "sans-serif"],
+                    "caption": ["Inter", "sans-serif"],
+                    "display-lg": ["Inter", "sans-serif"],
+                    "body-medium": ["Inter", "sans-serif"],
+                    "body-base": ["Inter", "sans-serif"]
+            },
+            "fontSize": {
+                    "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                    "headline-md": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                    "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                    "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                    "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                    "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                    "display-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "body-medium": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                    "body-base": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        /* Material Symbols Fill Configuration */
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom Scrollbar for sterile feel */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c4c5d7;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #747686;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background h-screen overflow-hidden flex w-full">
+<!-- SideNavBar (Shared Component Blueprint) -->
+<aside class="hidden md:flex flex-col h-full w-64 bg-surface-container-low border-r border-outline-variant flex-shrink-0 relative z-10">
+<div class="p-md flex items-center gap-sm border-b border-outline-variant/50 pb-lg mb-sm">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+<span class="material-symbols-outlined text-[18px]">ecg</span>
+</div>
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Disease Modules</h2>
+<p class="font-caption text-caption text-on-surface-variant">Predictive Workspace</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col p-md gap-sm overflow-y-auto">
+<!-- Active Tab from JSON context, though TopNav dictates History -->
+<a class="flex items-center gap-3 p-md text-primary font-bold bg-surface-container-highest rounded-lg translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="medical_services">medical_services</span>
+<span class="font-label-md text-label-md">Diabetes</span>
+</a>
+<a class="flex items-center gap-3 p-md text-on-surface-variant hover:bg-surface-container-high transition-colors rounded-lg group" href="#">
+<span class="material-symbols-outlined text-[20px] group-hover:text-primary transition-colors" data-icon="monitor_heart">monitor_heart</span>
+<span class="font-label-md text-label-md">Heart Disease (Soon)</span>
+</a>
+</nav>
+<div class="p-md border-t border-outline-variant/50 mt-auto">
+<button class="w-full flex items-center justify-center gap-2 p-sm bg-surface-container-highest text-primary font-label-md text-label-md rounded-lg hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[16px]">trending_up</span>
+                Upgrade Analytics
+            </button>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<div class="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
+<!-- TopNavBar (Shared Component Blueprint) -->
+<header class="bg-surface border-b border-outline-variant shadow-sm w-full flex-shrink-0 z-20">
+<div class="flex justify-between items-center w-full px-margin-desktop h-16">
+<!-- Brand / Logo Area -->
+<div class="flex items-center gap-3">
+<span class="font-headline-md text-headline-md text-primary">Health Risk Predictor</span>
+</div>
+<!-- Global Navigation -->
+<nav class="hidden md:flex items-center gap-lg h-full">
+<a class="h-full flex items-center px-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all font-body-medium text-body-medium" href="#">
+                        Dashboard
+                    </a>
+<a class="h-full flex items-center px-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all font-body-medium text-body-medium" href="#">
+                        New Prediction
+                    </a>
+<!-- Active State Applied Here based on Prompt Intent -->
+<a class="h-full flex items-center px-2 text-primary font-bold border-b-2 border-primary pb-1 opacity-80 scale-95 transition-all font-body-medium text-body-medium" href="#">
+                        History
+                    </a>
+<a class="h-full flex items-center px-2 text-on-surface-variant hover:text-primary hover:bg-surface-container-low transition-all font-body-medium text-body-medium" href="#">
+                        Analytics
+                    </a>
+</nav>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-sm">
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition-all">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Page Content Scrollable Area -->
+<main class="flex-1 overflow-y-auto w-full p-margin-mobile md:p-margin-desktop bg-background">
+<div class="max-w-max-width mx-auto w-full flex flex-col gap-lg">
+<!-- Header & Actions -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-headline-lg text-headline-lg text-on-background">Prediction History</h1>
+<p class="font-body-base text-body-base text-on-surface-variant mt-1">Review past clinical risk assessments and patient models.</p>
+</div>
+<button class="inline-flex items-center justify-center gap-2 px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg text-primary font-body-medium text-body-medium hover:bg-surface-container-low transition-colors shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] focus:ring-2 focus:ring-primary/20 outline-none w-full md:w-auto">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                        Export as CSV
+                    </button>
+</div>
+<!-- Filters & Search Toolbar -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-lg p-sm shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] flex flex-col lg:flex-row gap-sm items-center">
+<!-- Search Input -->
+<div class="relative w-full lg:max-w-sm flex-grow">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[20px]">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest border border-outline-variant rounded text-on-surface font-body-base text-body-base placeholder:text-outline focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-fixed transition-all h-10" placeholder="Search Patient ID..." type="text"/>
+</div>
+<div class="w-px h-6 bg-outline-variant hidden lg:block mx-2"></div>
+<!-- Filter: Risk Band -->
+<div class="relative w-full lg:w-48">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">filter_list</span>
+<select class="w-full pl-9 pr-8 py-2 bg-surface-container-lowest border border-outline-variant rounded text-on-surface font-body-base text-body-base appearance-none focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-fixed transition-all h-10 cursor-pointer">
+<option value="">All Risk Bands</option>
+<option value="high">High Risk</option>
+<option value="moderate">Moderate Risk</option>
+<option value="low">Low Risk</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none text-[18px]">arrow_drop_down</span>
+</div>
+<!-- Filter: Date Range -->
+<div class="relative w-full lg:w-48">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">calendar_today</span>
+<select class="w-full pl-9 pr-8 py-2 bg-surface-container-lowest border border-outline-variant rounded text-on-surface font-body-base text-body-base appearance-none focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-fixed transition-all h-10 cursor-pointer">
+<option value="30">Last 30 Days</option>
+<option value="90">Last 90 Days</option>
+<option value="365">This Year</option>
+<option value="all">All Time</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none text-[18px]">arrow_drop_down</span>
+</div>
+</div>
+<!-- High-Density Data Table Card -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[800px]">
+<thead class="bg-surface-container w-full">
+<tr>
+<th class="py-2.5 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant whitespace-nowrap w-32">Date</th>
+<th class="py-2.5 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant whitespace-nowrap">Patient ID</th>
+<th class="py-2.5 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant whitespace-nowrap">Disease Module</th>
+<th class="py-2.5 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant whitespace-nowrap w-24 text-right">Risk Score</th>
+<th class="py-2.5 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant whitespace-nowrap w-32 text-center">Risk Band</th>
+<th class="py-2.5 px-4 font-label-md text-label-md text-on-surface-variant border-b border-outline-variant whitespace-nowrap w-24 text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/50">
+<!-- High Risk Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface">Oct 24, 2024</td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-primary">PID-8842-A</td>
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">medical_services</span>
+                                        Type 2 Diabetes
+                                    </td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-on-surface text-right">87.4%</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-error/10 text-error font-label-md text-label-md border border-error/20">
+                                            High
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors group-hover:underline" href="#">
+                                            View Details
+                                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</td>
+</tr>
+<!-- Moderate Risk Row -->
+<tr class="hover:bg-surface-container-low transition-colors group bg-surface-container-lowest">
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface">Oct 23, 2024</td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-primary">PID-1092-C</td>
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">medical_services</span>
+                                        Type 2 Diabetes
+                                    </td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-on-surface text-right">45.2%</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-secondary/10 text-secondary font-label-md text-label-md border border-secondary/20">
+                                            Moderate
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors group-hover:underline" href="#">
+                                            View Details
+                                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</td>
+</tr>
+<!-- Low Risk Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface">Oct 21, 2024</td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-primary">PID-7731-M</td>
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">medical_services</span>
+                                        Type 2 Diabetes
+                                    </td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-on-surface text-right">12.8%</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-tertiary/10 text-tertiary font-label-md text-label-md border border-tertiary/20">
+                                            Low
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors group-hover:underline" href="#">
+                                            View Details
+                                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</td>
+</tr>
+<!-- Moderate Risk Row -->
+<tr class="hover:bg-surface-container-low transition-colors group bg-surface-container-lowest">
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface">Oct 20, 2024</td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-primary">PID-4029-B</td>
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">monitor_heart</span>
+                                        Heart Disease (Alpha)
+                                    </td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-on-surface text-right">58.1%</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-secondary/10 text-secondary font-label-md text-label-md border border-secondary/20">
+                                            Moderate
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors group-hover:underline" href="#">
+                                            View Details
+                                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</td>
+</tr>
+<!-- High Risk Row -->
+<tr class="hover:bg-surface-container-low transition-colors group">
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface">Oct 18, 2024</td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-primary">PID-9921-X</td>
+<td class="py-3 px-4 font-body-base text-body-base text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-outline">medical_services</span>
+                                        Type 2 Diabetes
+                                    </td>
+<td class="py-3 px-4 font-body-medium text-body-medium text-on-surface text-right">91.0%</td>
+<td class="py-3 px-4 text-center">
+<span class="inline-flex items-center justify-center px-2.5 py-0.5 rounded-full bg-error/10 text-error font-label-md text-label-md border border-error/20">
+                                            High
+                                        </span>
+</td>
+<td class="py-3 px-4 text-right">
+<a class="inline-flex items-center gap-1 font-label-md text-label-md text-primary hover:text-primary-container transition-colors group-hover:underline" href="#">
+                                            View Details
+                                            <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Table Pagination / Footer -->
+<div class="bg-surface-container px-4 py-3 border-t border-outline-variant flex items-center justify-between text-on-surface-variant">
+<span class="font-body-medium text-body-medium">Showing 1 to 5 of 124 predictions</span>
+<div class="flex gap-2">
+<button class="p-1 rounded hover:bg-surface-variant transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button class="p-1 rounded hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer (Shared Component Blueprint) -->
+<footer class="mt-xl border-t border-outline-variant bg-surface-container-lowest w-full">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-lg max-w-max-width mx-auto gap-4">
+<span class="font-label-md text-label-md text-on-surface">Health Risk Predictor</span>
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Health Risk Predictor. For clinical decision support only.</p>
+<div class="flex gap-4">
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors" href="#">About HRP</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

@@ -1,66 +1,178 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import Icon from "./components/Icon";
+import LandingPage from "./pages/LandingPage";
+import Home from "./pages/Home";
+import Analysis from "./pages/Analysis";
 import Dashboard from "./pages/Dashboard";
-import PredictionPage from "./pages/PredictionPage";
-import AnalyticsPage from "./pages/AnalyticsPage";
-import ModelInfoPage from "./pages/ModelInfoPage";
+import History from "./pages/History";
+import SignIn from "./pages/SignIn";
+import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DISCLAIMER } from "./config/diseases";
 
-const navItems = [
-  { to: "/", label: "Dashboard", end: true },
-  { to: "/predict/diabetes", label: "Diabetes", end: false },
-  { to: "/predict/heart", label: "Heart Disease", end: false },
-  { to: "/analytics/diabetes", label: "Analytics", end: false },
-  { to: "/models", label: "Model Info", end: false },
+// Persistent left-sidebar navigation shown once "logged in".
+// Not rendered on the Sign In / Sign Up / Landing routes.
+const NAV_ITEMS = [
+  { to: "/", label: "Home", icon: "home", end: true },
+  { to: "/analysis", label: "Analysis", icon: "analytics", end: false },
+  { to: "/dashboard", label: "Dashboard", icon: "dashboard", end: false },
+  { to: "/history", label: "History", icon: "history", end: false },
 ];
+
+function Sidebar() {
+  return (
+    <aside className="hidden md:flex flex-col w-64 shrink-0 bg-surface-container-low border-r border-outline-variant">
+      <div className="p-5 flex items-center gap-3 border-b border-outline-variant/50">
+        <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-on-primary">
+          <Icon name="ecg" className="text-[18px]" />
+        </div>
+        <div>
+          <h2 className="text-headline-sm text-on-surface leading-tight">
+            Health Risk
+          </h2>
+          <p className="text-caption text-on-surface-variant">Predictor</p>
+        </div>
+      </div>
+
+      <nav className="flex-1 flex flex-col p-3 gap-1">
+        {NAV_ITEMS.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            end={item.end}
+            className={({ isActive }) =>
+              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-label-md transition ${
+                isActive
+                  ? "bg-surface-container-highest text-primary font-bold"
+                  : "text-on-surface-variant hover:bg-surface-container-high hover:text-primary"
+              }`
+            }
+          >
+            <Icon name={item.icon} className="text-[20px]" />
+            {item.label}
+          </NavLink>
+        ))}
+      </nav>
+
+      <div className="p-4 border-t border-outline-variant/50">
+        <button className="w-full flex items-center justify-center gap-2 p-2.5 bg-surface-container-highest text-primary text-label-md rounded-lg hover:bg-surface-variant transition">
+          <Icon name="trending_up" className="text-[16px]" />
+          Upgrade Analytics
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function TopBar() {
+  return (
+    <header className="bg-surface border-b border-outline-variant shadow-sm shrink-0">
+      <div className="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto">
+        <div className="flex items-center gap-3 md:hidden">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary">
+            <Icon name="ecg" className="text-[16px]" />
+          </div>
+          <span className="text-headline-md text-primary">Health Risk Predictor</span>
+        </div>
+        <span className="hidden md:block text-headline-md text-primary">
+          Health Risk Predictor
+        </span>
+        <div className="flex items-center gap-1">
+          <button className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition">
+            <Icon name="settings" className="text-[20px]" />
+          </button>
+          <button className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition">
+            <Icon name="account_circle" className="text-[20px]" />
+          </button>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+function Footer() {
+  return (
+    <footer className="border-t border-outline-variant bg-surface-container-lowest shrink-0">
+      <div className="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop py-4">
+        <p className="text-caption text-on-surface-variant leading-relaxed">
+          {DISCLAIMER}
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+function AppShell() {
+  return (
+    <div className="h-screen flex overflow-hidden">
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <TopBar />
+        <main className="flex-1 overflow-y-auto bg-background">
+          <div className="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop py-8">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/analysis" element={<Analysis />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/history" element={<History />} />
+            </Routes>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    </div>
+  );
+}
+
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="text-center space-y-4 max-w-md">
+          <Icon name="lock" className="text-[48px] text-on-surface-variant" />
+          <div>
+            <h2 className="text-headline-lg text-on-surface">Authentication Required</h2>
+            <p className="text-body-base text-on-surface-variant mt-2">
+              Please sign in to access this page.
+            </p>
+          </div>
+          <Link
+            to="/signin"
+            className="btn-primary inline-flex"
+          >
+            <Icon name="login" className="text-[18px]" />
+            Sign In
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
 
 export default function App() {
   return (
-    <div className="min-h-full flex flex-col">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-brand-600 text-white flex items-center justify-center font-bold">
-              HR
-            </div>
-            <span className="font-semibold text-slate-800">
-              Health Risk Predictor
-            </span>
-          </div>
-          <nav className="flex gap-1 flex-wrap">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                end={item.end}
-                className={({ isActive }) =>
-                  `px-3 py-1.5 rounded-md text-sm font-medium transition ${
-                    isActive
-                      ? "bg-brand-50 text-brand-700"
-                      : "text-slate-600 hover:text-brand-700 hover:bg-slate-100"
-                  }`
-                }
-              >
-                {item.label}
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-      </header>
-
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-8">
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/predict/:disease" element={<PredictionPage />} />
-          <Route path="/analytics/:disease" element={<AnalyticsPage />} />
-          <Route path="/models" element={<ModelInfoPage />} />
-        </Routes>
-      </main>
-
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
-          <p className="text-xs text-slate-500 leading-relaxed">{DISCLAIMER}</p>
-        </div>
-      </footer>
-    </div>
+    <AuthProvider>
+      <Routes>
+        {/* Landing page — shown only when not authenticated */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        {/* Protected app routes — require authentication */}
+        <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+      </Routes>
+    </AuthProvider>
   );
 }

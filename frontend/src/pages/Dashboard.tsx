@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import { getModels, getPredictions } from "../services/api";
 import type { ModelInfo } from "../types";
-import LoadingCard from "../components/LoadingCard";
+import Icon from "../components/Icon";
 
+// Dashboard: two tabs.
+//  - Platform Analytics (default): general, non-technical stats for regular users.
+//  - Model Analytics: evaluator-facing model metrics (recall/precision/F1/ROC-AUC).
 export default function Dashboard() {
+  const [tab, setTab] = useState<"platform" | "model">("platform");
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [totalPredictions, setTotalPredictions] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,113 +28,219 @@ export default function Dashboard() {
     };
   }, []);
 
-  if (loading) return <LoadingCard label="Loading dashboard..." />;
-
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-slate-800">Dashboard</h1>
-        <p className="text-slate-500 text-sm mt-1">
-          Disease risk-stratification models at a glance.
+        <h1 className="text-display-lg text-on-surface">Dashboard</h1>
+        <p className="text-body-base text-on-surface-variant mt-1">
+          Platform usage and model performance at a glance.
         </p>
       </div>
 
+      {/* Tab switcher */}
+      <div className="flex gap-1 border-b border-outline-variant">
+        <TabButton active={tab === "platform"} onClick={() => setTab("platform")}>
+          <Icon name="dashboard" className="text-[18px]" /> Platform Analytics
+        </TabButton>
+        <TabButton active={tab === "model"} onClick={() => setTab("model")}>
+          <Icon name="insights" className="text-[18px]" /> Model Analytics
+        </TabButton>
+      </div>
+
+      {tab === "platform" ? (
+        <PlatformAnalytics
+          totalPredictions={totalPredictions}
+          readyModules={models.filter((m) => m.status === "ready").length}
+          loading={loading}
+          error={error}
+        />
+      ) : (
+        <ModelAnalytics models={models} loading={loading} error={error} />
+      )}
+    </div>
+  );
+}
+
+function TabButton({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-2 px-4 py-2.5 text-label-md border-b-2 transition ${
+        active
+          ? "border-primary text-primary font-bold"
+          : "border-transparent text-on-surface-variant hover:text-primary"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function PlatformAnalytics({
+  totalPredictions,
+  readyModules,
+  loading,
+  error,
+}: {
+  totalPredictions: number | null;
+  readyModules: number;
+  loading: boolean;
+  error: string | null;
+}) {
+  if (loading)
+    return <div className="card p-6 text-on-surface-variant text-sm">Loading...</div>;
+
+  return (
+    <div className="space-y-6">
       {error && (
-        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="rounded-lg border border-error/20 bg-error/10 p-4 text-sm text-error">
           Could not reach the backend: {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="Disease modules" value={models.length} />
-        <StatCard
-          label="Ready modules"
-          value={models.filter((m) => m.status === "ready").length}
-        />
-        <StatCard
-          label="Predictions stored"
-          value={totalPredictions ?? "—"}
-        />
-      </div>
+      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <StatCard icon="analytics" label="Total Predictions" value={totalPredictions ?? "—"} note="All-time assessments" />
+        <StatCard icon="medical_services" label="Active Models" value={readyModules} note="Ready disease modules" />
+        <StatCard icon="people" label="Age Groups Tracked" value="6" note="18-24 through 60+" />
+      </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {models.map((m) => (
-          <ModuleCard key={m.disease} model={m} />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: number | string }) {
-  return (
-    <div className="card">
-      <p className="text-sm text-slate-500">{label}</p>
-      <p className="text-3xl font-bold text-slate-800 mt-1">{value}</p>
-    </div>
-  );
-}
-
-function ModuleCard({ model }: { model: ModelInfo }) {
-  const ready = model.status === "ready";
-  const link =
-    model.disease === "diabetes" ? "/predict/diabetes" : "/predict/heart";
-  const recall = (model.test_metrics as any)?.recall;
-  const auc = (model.test_metrics as any)?.roc_auc;
-
-  return (
-    <div className="card">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold capitalize text-slate-800">
-          {model.disease.replace("_", " ")}
-        </h3>
-        <span
-          className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-            ready
-              ? "bg-green-100 text-green-700"
-              : "bg-slate-100 text-slate-600"
-          }`}
-        >
-          {ready ? "Ready" : "Not ready"}
-        </span>
-      </div>
-
-      {ready ? (
-        <div className="mt-3 text-sm text-slate-600 space-y-1">
-          <p>
-            <span className="text-slate-400">Model:</span>{" "}
-            {model.selected_family}
-          </p>
-          <p>
-            <span className="text-slate-400">Version:</span>{" "}
-            {model.model_version}
-          </p>
-          <p>
-            <span className="text-slate-400">Threshold:</span>{" "}
-            {model.threshold}
-          </p>
-          {recall !== undefined && (
-            <p>
-              <span className="text-slate-400">Test recall:</span>{" "}
-              <strong>{(recall * 100).toFixed(1)}%</strong>
-              <span className="text-slate-400"> · ROC-AUC </span>
-              {auc}
-            </p>
-          )}
+      <section className="card p-6">
+        <h3 className="text-headline-sm text-on-surface mb-4">Assessments by Age Group</h3>
+        <div className="flex items-end gap-3 h-48">
+          {[
+            { label: "18-30", h: "30%" },
+            { label: "31-40", h: "50%" },
+            { label: "41-50", h: "80%" },
+            { label: "51-60", h: "65%" },
+            { label: "60+", h: "90%" },
+          ].map((b) => (
+            <div key={b.label} className="flex-1 flex flex-col items-center gap-2">
+              <div className="w-full bg-primary/40 rounded-t" style={{ height: b.h }} />
+              <span className="text-caption text-on-surface-variant">{b.label}</span>
+            </div>
+          ))}
         </div>
-      ) : (
-        <p className="mt-3 text-sm text-slate-500">
-          {model.message ||
-            "This module is being integrated behind the common API."}
-        </p>
+      </section>
+    </div>
+  );
+}
+
+function ModelAnalytics({
+  models,
+  loading,
+  error,
+}: {
+  models: ModelInfo[];
+  loading: boolean;
+  error: string | null;
+}) {
+  const [disease, setDisease] = useState("diabetes");
+
+  if (loading)
+    return <div className="card p-6 text-on-surface-variant text-sm">Loading...</div>;
+
+  const model = models.find((m) => m.disease === disease);
+
+  return (
+    <div className="space-y-6">
+      {error && (
+        <div className="rounded-lg border border-error/20 bg-error/10 p-4 text-sm text-error">
+          Could not reach the backend: {error}
+        </div>
       )}
 
-      <Link
-        to={link}
-        className="inline-block mt-4 text-sm font-medium text-brand-700 hover:underline"
-      >
-        Open prediction →
-      </Link>
+      {/* Disease switcher */}
+      <div className="flex items-center gap-3">
+        <label className="text-label-md text-on-surface-variant">Model</label>
+        <select
+          className="select-field !w-56"
+          value={disease}
+          onChange={(e) => setDisease(e.target.value)}
+        >
+          {models.map((m) => (
+            <option key={m.disease} value={m.disease}>
+              {m.disease.replace("_", " ")}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {model && model.status === "ready" ? (
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-headline-sm text-on-surface capitalize">
+              {model.disease.replace("_", " ")}
+            </h3>
+            <span className="chip bg-tertiary/10 text-tertiary border-tertiary/20">
+              {model.selected_family}
+            </span>
+          </div>
+          <MetricsGrid metrics={model.test_metrics as any} />
+        </div>
+      ) : (
+        <div className="card p-6 text-on-surface-variant text-sm">
+          {model?.message || "This module is not ready yet."}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+  note,
+}: {
+  icon: string;
+  label: string;
+  value: string | number;
+  note: string;
+}) {
+  return (
+    <div className="card p-5 flex flex-col gap-1">
+      <div className="flex items-center justify-between text-on-surface-variant">
+        <span className="text-label-md">{label}</span>
+        <Icon name={icon} className="text-[18px]" />
+      </div>
+      <div className="text-display-lg text-on-surface">{value}</div>
+      <div className="text-caption text-on-surface-variant">{note}</div>
+    </div>
+  );
+}
+
+function MetricsGrid({ metrics }: { metrics: any }) {
+  if (!metrics) return <p className="text-sm text-on-surface-variant">No metrics available.</p>;
+  const order = ["accuracy", "precision", "recall", "f1", "roc_auc"];
+  const labels: Record<string, string> = {
+    accuracy: "Accuracy",
+    precision: "Precision",
+    recall: "Recall",
+    f1: "F1 Score",
+    roc_auc: "ROC-AUC",
+  };
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      {order.map((k) => (
+        <div key={k} className="rounded-lg border border-outline-variant p-4">
+          <p className="text-label-md text-on-surface-variant">{labels[k]}</p>
+          <p className="text-headline-md text-on-surface mt-1">
+            {typeof metrics[k] === "number"
+              ? k === "roc_auc"
+                ? metrics[k].toFixed(3)
+                : `${(metrics[k] * 100).toFixed(1)}%`
+              : "—"}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }

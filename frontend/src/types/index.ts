@@ -42,15 +42,23 @@ export interface NotReadyDetail {
   message: string;
 }
 
+export interface SelectOption {
+  label: string;
+  value: number;
+}
+
 export interface FieldDef {
   name: string;
   label: string;
-  type: "number";
-  min: number;
-  max: number;
-  step: number;
+  type: "number" | "select";
+  min?: number;
+  max?: number;
+  step?: number;
   default: number;
-  hint: string;
+  hint?: string;
+  unit?: string;
+  options?: SelectOption[];
+  group?: string; // section grouping, e.g. "Demographic" | "Vitals" | "Lab Results"
 }
 
 // Risk band configuration sourced centrally so labels/colors are not

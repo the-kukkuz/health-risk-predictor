@@ -15,6 +15,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 REPO_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_MODEL_DIR = REPO_ROOT / "models" / "diabetes"
 DEFAULT_DATA_DIR = REPO_ROOT / "data" / "diabetes"
+DEFAULT_HEART_MODEL_DIR = REPO_ROOT / "models" / "heart" / "v1.0.0"
 
 
 class Settings(BaseSettings):
@@ -42,6 +43,7 @@ class Settings(BaseSettings):
     # Model / data locations (overridable for tests)
     model_dir: str = str(DEFAULT_MODEL_DIR)
     data_dir: str = str(DEFAULT_DATA_DIR)
+    heart_model_dir: str = str(DEFAULT_HEART_MODEL_DIR)
     load_ml_model: bool = True
 
     @property
@@ -68,6 +70,14 @@ class Settings(BaseSettings):
     @property
     def analytics_data_path(self) -> Path:
         return Path(self.data_dir) / "pima-indians-diabetes.csv"
+
+    @property
+    def heart_model_path(self) -> Path:
+        return Path(self.heart_model_dir) / "heart_model.joblib"
+
+    @property
+    def heart_metadata_path(self) -> Path:
+        return Path(self.heart_model_dir) / "metadata.json"
 
 
 @lru_cache
