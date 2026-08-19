@@ -58,7 +58,7 @@ def login(payload: LoginSchema):
     except Exception as e:
         raise HTTPException(status_code=400, detail="Invalid login credentials")
 
-@router.get("/me")
-def get_profile(current_user: dict = Depends(get_current_user)):
-    """Protected endpoint to test token authorization."""
-    return {"status": "authenticated", "user": current_user}
+#@router.get("/me")
+#def get_profile(current_user: dict = Depends(get_current_user)):
+#    """Protected endpoint to test token authorization."""
+#    return {"status": "authenticated", "user": current_user} 
