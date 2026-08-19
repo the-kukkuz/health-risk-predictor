@@ -15,8 +15,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   function login(username: string, password: string): boolean {
     // Hardcoded credentials for testing
-    // Accept "admin" as both username and password (case-insensitive)
-    if (username.toLowerCase() === "admin" && password === "admin") {
+    // Accept "admin" as username or email (case-insensitive)
+    // Password must be "admin"
+    const normalized = username.toLowerCase().trim();
+    if ((normalized === "admin" || normalized.endsWith("@admin")) && password === "admin") {
       setIsAuthenticated(true);
       localStorage.setItem("hrp_auth", "true");
       return true;

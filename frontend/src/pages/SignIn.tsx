@@ -1,16 +1,20 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Icon from "../components/Icon";
 import AuthLayout from "../components/AuthLayout";
 import PasswordInput from "../components/PasswordInput";
+import { useAuth } from "../contexts/AuthContext";
 
-// Sign In page. Design-first stub: form layout only, no auth wiring yet.
-// Rendered outside the sidebar shell.
+// Sign In page. Calls useAuth().login() on valid credentials.
+// Mock credentials: admin / admin (replace with Supabase once integrated).
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
@@ -25,9 +29,17 @@ export default function SignIn() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!validate()) return;
+    setLoginError("");
     setLoading(true);
-    // Stub: no auth wiring yet. Replace with real login logic.
-    setTimeout(() => setLoading(false), 1000);
+
+    const success = login(email, password);
+    setLoading(false);
+
+    if (success) {
+      navigate("/");
+    } else {
+      setLoginError("Invalid email or password. Try admin / admin for demo.");
+    }
   }
 
   return (
@@ -35,6 +47,12 @@ export default function SignIn() {
       title="Sign in"
       subtitle="Access your risk assessments and analytics."
     >
+      {loginError && (
+        <div className="rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error">
+          {loginError}
+        </div>
+      )}
+
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="label-field" htmlFor="email">Email</label>
