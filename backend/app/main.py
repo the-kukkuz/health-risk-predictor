@@ -95,6 +95,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Routers
 app.include_router(health_route.router)
 app.include_router(models_route.router)
