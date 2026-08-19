@@ -18,6 +18,15 @@ from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
+# The ml/ package is not packaged; add it to sys.path so the training-time
+# inference helpers (predict.py, explain.py) are importable.
+import sys  # noqa: E402
+
+_ML_ROOT = Path(__file__).resolve().parents[4] / "ml"
+if str(_ML_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ML_ROOT))
+
+
 class HeartModelBundle:
     """Holds the loaded artifact, metadata, and the reusable SHAP explainer."""
 
@@ -47,8 +56,16 @@ class HeartModelBundle:
             with open(metadata_path) as f:
                 self.metadata = json.load(f)
 
-        # Build the SHAP explainer (if possible, but we will use empty for now to avoid OHE issues)
-        self.explainer = None
+        # Build the SHAP explainer once at startup for fast per-request XAI.
+        try:
+            from heart.src import explain  # type: ignore
+
+            logger.info("Building SHAP explainer (one-time startup cost)...")
+            self.explainer = explain.build_explainer(self.artifact)
+            logger.info("SHAP explainer ready.")
+        except Exception as exc:  # pragma: no cover - defensive
+            logger.warning("SHAP explainer could not be built: %s", exc)
+            self.explainer = None
 
         self.loaded = True
         logger.info(
@@ -85,8 +102,11 @@ class HeartModelBundle:
         }
 
     def explain(self, record: dict, top_n: int = 5) -> list:
-        # SHAP removed for heart as requested in the pipeline
-        return []
+        from heart.src import explain  # type: ignore
+
+        return explain.explain_one(
+            self.artifact, record, explainer=self.explainer, top_n=top_n
+        )
 
 _bundle: Optional[HeartModelBundle] = None
 _lock = threading.Lock()
