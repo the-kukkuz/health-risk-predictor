@@ -6,6 +6,9 @@ import Dashboard from "./pages/Dashboard";
 import History from "./pages/History";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { DISCLAIMER } from "./config/diseases";
 
 // Persistent left-sidebar navigation shown once "logged in" (demo: always).
@@ -127,6 +130,9 @@ export default function App() {
     <Routes>
       <Route path="/signin" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/terms" element={<TermsOfService />} />
+      <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/*" element={<AppShell />} />
     </Routes>
   );
