@@ -38,7 +38,7 @@ export default function SignIn() {
     if (success) {
       navigate("/");
     } else {
-      setLoginError("Invalid email or password. Try admin / admin for demo.");
+      setLoginError("Invalid email or password. Try admin / admin1234 for demo.");
     }
   }
 
