@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Health Risk Predictor - Early Awareness</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error-container": "#93000a",
+                    "secondary-fixed": "#cce5ff",
+                    "tertiary": "#00501f",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#f2f3ff",
+                    "secondary-container": "#5bb8fe",
+                    "on-tertiary-container": "#71ee8a",
+                    "on-secondary-container": "#00476e",
+                    "primary-container": "#1d4ed8",
+                    "on-primary": "#ffffff",
+                    "surface-variant": "#dae2fd",
+                    "outline-variant": "#c4c5d7",
+                    "outline": "#747686",
+                    "on-secondary-fixed": "#001d31",
+                    "secondary": "#006398",
+                    "surface": "#faf8ff",
+                    "surface-container-high": "#e2e7ff",
+                    "surface-container-highest": "#dae2fd",
+                    "on-tertiary-fixed-variant": "#005320",
+                    "error-container": "#ffdad6",
+                    "tertiary-fixed": "#7ffc97",
+                    "primary-fixed-dim": "#b7c4ff",
+                    "surface-tint": "#2151da",
+                    "on-surface-variant": "#434655",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed": "#002109",
+                    "error": "#ba1a1a",
+                    "on-secondary": "#ffffff",
+                    "surface-dim": "#d2d9f4",
+                    "inverse-surface": "#283044",
+                    "primary-fixed": "#dce1ff",
+                    "inverse-primary": "#b7c4ff",
+                    "surface-bright": "#faf8ff",
+                    "background": "#faf8ff",
+                    "on-surface": "#131b2e",
+                    "on-secondary-fixed-variant": "#004b73",
+                    "tertiary-container": "#006b2c",
+                    "surface-container": "#eaedff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed-variant": "#0039b5",
+                    "secondary-fixed-dim": "#93ccff",
+                    "tertiary-fixed-dim": "#62df7d",
+                    "inverse-on-surface": "#eef0ff",
+                    "on-primary-fixed": "#001551",
+                    "primary": "#0037b0",
+                    "on-background": "#131b2e",
+                    "on-primary-container": "#cad3ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "sm": "8px",
+                    "base": "4px",
+                    "md": "16px",
+                    "max-width": "1280px",
+                    "margin-desktop": "32px",
+                    "gutter": "24px",
+                    "lg": "24px",
+                    "xs": "4px",
+                    "margin-mobile": "16px",
+                    "xl": "32px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-base": ["Inter"],
+                    "body-medium": ["Inter"],
+                    "caption": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "headline-lg": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-sm": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "body-base": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "body-medium": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}],
+                    "display-lg": ["30px", {"lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-md": ["12px", {"lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500"}],
+                    "headline-md": ["18px", {"lineHeight": "28px", "fontWeight": "600"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #F8FAFC; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .material-symbols-outlined.fill { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface antialiased flex flex-col min-h-screen">
+<!-- TopNav - Landing Page variant -->
+<header class="bg-surface border-b border-outline-variant shadow-sm w-full sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto h-16">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined fill text-primary text-2xl">health_and_safety</span>
+<span class="font-headline-md text-headline-md text-primary tracking-tight">Health Risk Predictor</span>
+</div>
+<div class="flex items-center gap-md">
+<a class="hidden sm:block font-label-md text-label-md text-primary px-4 py-2 border border-outline-variant rounded hover:bg-surface-container-low transition-colors" href="#">Sign In</a>
+<a class="font-label-md text-label-md text-on-primary bg-primary-container px-4 py-2 rounded shadow-sm hover:opacity-90 transition-opacity" href="#">Sign Up</a>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="w-full px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto py-16 md:py-24 grid grid-cols-1 md:grid-cols-2 gap-gutter items-center">
+<div class="flex flex-col gap-lg">
+<h1 class="font-display-lg text-display-lg text-on-surface">Early Awareness for Your Long-term Health</h1>
+<p class="font-body-base text-body-base text-on-surface-variant max-w-lg">
+                    A decision-support tool for diabetes and heart disease risk estimation. Input your data, get explained results, and take the first step toward prevention.
+                </p>
+<div class="flex items-center gap-sm bg-surface-container-low p-sm rounded border border-outline-variant w-fit">
+<span class="material-symbols-outlined text-outline text-sm">info</span>
+<p class="font-caption text-caption text-on-surface-variant">This is a decision-support tool, not a medical diagnosis.</p>
+</div>
+<div>
+<a class="inline-flex items-center justify-center font-label-md text-label-md text-on-primary bg-primary-container px-8 py-3 rounded-lg shadow-sm hover:shadow-md transition-all" href="#">Get Started</a>
+</div>
+</div>
+<div class="hidden md:block w-full h-[400px] rounded-xl overflow-hidden border border-outline-variant shadow-sm relative">
+<div class="w-full h-full bg-cover bg-center" data-alt="A clean, modern, minimalist 3D rendering of abstract medical data visualization, featuring light blue and soft white tones, illuminated in a sterile, professional studio setting. The imagery suggests precision, advanced analytics, and clinical trust." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCJ3Nw2tn4ojrXLDiNo9vRMaXM7aa5yEnG1izoRHKYBtWOiu1xtFEd0oIR3iVQlJ6uCXiFRXYh_cES8F5dWSAlLhC2XtlqSMk4w9onptccXxWn5HuUF2oonGCpMCusYhpVrl9-GEtZolENDTMZhsnnvAwpq0VMN-QT8bUdj3r80f__8_OigjbZbkmeYwsS4jVmXkXDG5HuWfXVwC8YTVyuoAcqp6f_wOXNDPutorw9gjRj6yzQmRXACHA')"></div>
+<!-- Mock UI overlay to suggest the tool -->
+<div class="absolute bottom-6 right-6 bg-surface p-4 rounded-lg border border-outline-variant shadow-md flex flex-col gap-sm w-48">
+<div class="flex justify-between items-center">
+<span class="font-caption text-caption text-on-surface-variant">Risk Estimate</span>
+<span class="font-label-md text-label-md text-error">Elevated</span>
+</div>
+<div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-error w-3/4"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- How It Works Section -->
+<section class="bg-surface-container-lowest w-full border-t border-b border-outline-variant py-16">
+<div class="px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto">
+<div class="text-center mb-12">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">How It Works</h2>
+<p class="font-body-base text-body-base text-on-surface-variant mt-2">A streamlined process for clinical insights.</p>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-md">
+<!-- Step 1 -->
+<div class="bg-surface p-lg rounded-lg border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] flex flex-col items-center text-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined">data_usage</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">1. Enter Data</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">Input relevant health metrics securely.</p>
+</div>
+<!-- Step 2 -->
+<div class="bg-surface p-lg rounded-lg border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] flex flex-col items-center text-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">2. Get Estimate</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">Receive an explained risk assessment.</p>
+</div>
+<!-- Step 3 -->
+<div class="bg-surface p-lg rounded-lg border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] flex flex-col items-center text-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined">forum</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">3. Ask Questions</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">Clarify results with interactive support.</p>
+</div>
+<!-- Step 4 -->
+<div class="bg-surface p-lg rounded-lg border border-outline-variant shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] flex flex-col items-center text-center gap-sm">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-primary mb-2">
+<span class="material-symbols-outlined">monitoring</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">4. Track Results</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">Monitor changes over time to measure progress.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Scope Section -->
+<section class="w-full px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto py-16">
+<div class="text-center mb-12">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Clinical Scope</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Scope 1 -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] flex flex-col sm:flex-row">
+<div class="sm:w-1/3 bg-surface-container-low flex items-center justify-center p-lg border-b sm:border-b-0 sm:border-r border-outline-variant">
+<span class="material-symbols-outlined text-primary text-5xl">medical_services</span>
+</div>
+<div class="p-lg sm:w-2/3 flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Diabetes Risk Screening</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">Evaluate metabolic indicators to estimate the likelihood of developing diabetes, supporting early intervention strategies.</p>
+</div>
+</div>
+<!-- Scope 2 -->
+<div class="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-[0_1px_3px_0_rgba(0,0,0,0.05)] flex flex-col sm:flex-row">
+<div class="sm:w-1/3 bg-surface-container-low flex items-center justify-center p-lg border-b sm:border-b-0 sm:border-r border-outline-variant">
+<span class="material-symbols-outlined text-primary text-5xl">monitor_heart</span>
+</div>
+<div class="p-lg sm:w-2/3 flex flex-col justify-center">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-2">Heart Disease Decision Support</h3>
+<p class="font-body-base text-body-base text-on-surface-variant">Analyze cardiovascular risk factors to provide actionable insights for long-term heart health management.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Trust Section -->
+<section class="bg-surface-container-lowest w-full border-t border-outline-variant py-16">
+<div class="px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+<div class="md:col-span-5 flex justify-center">
+<img class="w-full max-w-sm border border-outline-variant rounded-lg shadow-sm" data-alt="A clean, minimalist graphical representation of a SHAP chart or feature importance graph on a pristine white background. High contrast, precise hairline strokes in slate, subtle red and green indicators, conveying analytical rigor and scientific transparency." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHjV5CjcXCIFtpMNDkbtIxb7iMMOKzgOv75sxG0Qiwq5ycQ11I7uXAb6Yn-Iqb7wLBEDeRQvCe9wiFxQdgjNqzCGJ3PD-BN6Ys1O6KJW1QEC0271X2n5lsctIzH9bHczuHdRkGFIhjSqOyZ_KcnQlfrYDKMPd3KGv1HlIrlKc0nUv4F-ZCc5iiG1arr5DRXrR1xdVrbzikdKhL2V6Mbth69SOmbXwbZO2LlhcaT2I7M018jSpodUNywg"/>
+</div>
+<div class="md:col-span-7 flex flex-col gap-md">
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Explainable AI for Clinical Trust</h2>
+<p class="font-body-base text-body-base text-on-surface-variant">
+                        Our platform prioritizes transparency. Using SHAP (SHapley Additive exPlanations) values, every risk estimate is broken down to show exactly which health metrics contributed to the result—and by how much.
+                    </p>
+<p class="font-body-base text-body-base text-on-surface-variant">
+                        Grounded in validated clinical datasets, our models are designed to complement, not replace, professional medical judgment.
+                    </p>
+<div class="mt-4">
+<a class="font-label-md text-label-md text-primary flex items-center gap-1 hover:underline" href="#">
+                             Learn about our methodology <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer - Shared Component -->
+<footer class="bg-surface-container-lowest dark:bg-on-surface border-t border-outline-variant mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-lg max-w-max-width mx-auto gap-md">
+<!-- Brand & Disclaimer -->
+<div class="flex flex-col items-center md:items-start gap-xs text-center md:text-left">
+<span class="font-label-md text-label-md text-on-surface font-semibold">Health Risk Predictor</span>
+<span class="font-caption text-caption text-on-surface-variant dark:text-outline-variant">© 2024 Health Risk Predictor. For clinical decision support only.</span>
+</div>
+<!-- Links -->
+<div class="flex flex-wrap justify-center gap-md">
+<a class="font-caption text-caption text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Documentation</a>
+<a class="font-caption text-caption text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">About HRP</a>
+<a class="font-caption text-caption text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors" href="#">Privacy Policy</a>
+</div>
+<!-- Sign in / up links in footer -->
+<div class="flex gap-md">
+<a class="font-caption text-caption text-primary hover:underline" href="#">Sign In</a>
+<a class="font-caption text-caption text-primary hover:underline" href="#">Sign Up</a>
+</div>
+</div>
+</footer>
+</body></html>

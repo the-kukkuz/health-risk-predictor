@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Health Risk Predictor - New Prediction</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-high": "#e2e7ff",
+                        "surface": "#faf8ff",
+                        "on-tertiary-fixed": "#002109",
+                        "on-secondary": "#ffffff",
+                        "on-primary-fixed": "#001551",
+                        "error": "#ba1a1a",
+                        "on-primary-container": "#cad3ff",
+                        "on-tertiary-fixed-variant": "#005320",
+                        "primary-container": "#1d4ed8",
+                        "on-surface": "#131b2e",
+                        "on-secondary-fixed": "#001d31",
+                        "on-primary-fixed-variant": "#0039b5",
+                        "secondary-container": "#5bb8fe",
+                        "surface-tint": "#2151da",
+                        "surface-bright": "#faf8ff",
+                        "tertiary-container": "#006b2c",
+                        "inverse-surface": "#283044",
+                        "secondary-fixed-dim": "#93ccff",
+                        "on-secondary-fixed-variant": "#004b73",
+                        "outline-variant": "#c4c5d7",
+                        "surface-container-low": "#f2f3ff",
+                        "on-error": "#ffffff",
+                        "surface-dim": "#d2d9f4",
+                        "secondary": "#006398",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "on-background": "#131b2e",
+                        "on-secondary-container": "#00476e",
+                        "surface-container-lowest": "#ffffff",
+                        "primary": "#0037b0",
+                        "background": "#faf8ff",
+                        "surface-container-highest": "#dae2fd",
+                        "on-surface-variant": "#434655",
+                        "surface-container": "#eaedff",
+                        "tertiary-fixed-dim": "#62df7d",
+                        "inverse-on-surface": "#eef0ff",
+                        "primary-fixed-dim": "#b7c4ff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed": "#dce1ff",
+                        "inverse-primary": "#b7c4ff",
+                        "outline": "#747686",
+                        "tertiary": "#00501f",
+                        "on-tertiary-container": "#71ee8a",
+                        "secondary-fixed": "#cce5ff",
+                        "surface-variant": "#dae2fd",
+                        "tertiary-fixed": "#7ffc97",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "max-width": "1280px",
+                        "base": "4px",
+                        "margin-desktop": "32px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "xl": "32px",
+                        "gutter": "24px",
+                        "sm": "8px",
+                        "md": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "headline-sm": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "caption": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-medium": ["Inter"],
+                        "body-base": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.01em", "fontWeight": "500" }],
+                        "headline-md": ["18px", { "lineHeight": "28px", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }],
+                        "display-lg": ["30px", { "lineHeight": "36px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-medium": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+                        "body-base": ["14px", { "lineHeight": "20px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #faf8ff; /* theme('colors.background') equivalent */
+        }
+        .tooltip-container:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .custom-input:focus {
+            border-color: #1d4ed8;
+            box-shadow: 0 0 0 2px rgba(29, 78, 216, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-base">
+<!-- TopNavBar -->
+<header class="bg-surface dark:bg-on-surface text-primary dark:text-primary-fixed docked full-width top-0 shadow-sm border-b border-outline-variant dark:border-outline z-50">
+<div class="flex justify-between items-center w-full px-margin-desktop max-w-max-width mx-auto h-16">
+<div class="flex items-center gap-lg">
+<div class="text-headline-lg font-headline-lg text-primary dark:text-primary-fixed tracking-tight">Health Risk Predictor</div>
+<nav class="hidden md:flex gap-lg h-full items-center">
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors hover:bg-surface-container-low dark:hover:bg-surface-variant transition-all px-2 py-1 rounded" href="#">Dashboard</a>
+<a class="text-primary dark:text-primary-fixed font-bold border-b-2 border-primary dark:border-primary-fixed pb-1 px-2 hover:bg-surface-container-low dark:hover:bg-surface-variant transition-all" href="#">New Prediction</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors hover:bg-surface-container-low dark:hover:bg-surface-variant transition-all px-2 py-1 rounded" href="#">History</a>
+<a class="text-on-surface-variant dark:text-on-secondary-fixed-variant hover:text-primary transition-colors hover:bg-surface-container-low dark:hover:bg-surface-variant transition-all px-2 py-1 rounded" href="#">Analytics</a>
+</nav>
+</div>
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-low">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">account_circle</span>
+</button>
+</div>
+</div>
+</header>
+<div class="flex flex-1 overflow-hidden">
+<!-- SideNavBar (Suppressed for this specific flow as per instructions, but requested breadcrumbs indicate we are within a module. However, the requirement says "A multi-step or grouped form" and "Breadcrumbs", implying a focused task page where SideNav might be suppressed. I will suppress SideNav to focus on the canvas as per "Task-Focused" rule). Wait, let's keep it simple and focus on the main canvas. -->
+<main class="flex-1 overflow-y-auto px-margin-mobile md:px-margin-desktop py-lg max-w-max-width mx-auto w-full">
+<!-- Breadcrumbs -->
+<nav aria-label="Breadcrumb" class="flex text-body-medium text-on-surface-variant mb-lg">
+<ol class="inline-flex items-center space-x-1 md:space-x-3">
+<li class="inline-flex items-center">
+<a class="hover:text-primary transition-colors" href="#">Dashboard</a>
+</li>
+<li>
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">New Prediction</a>
+</div>
+</li>
+<li aria-current="page">
+<div class="flex items-center">
+<span class="material-symbols-outlined text-sm mx-1">chevron_right</span>
+<span class="text-primary font-medium">Diabetes</span>
+</div>
+</li>
+</ol>
+</nav>
+<div class="mb-xl">
+<h1 class="font-display-lg text-display-lg text-on-surface mb-sm">Diabetes Risk Assessment</h1>
+<p class="font-body-base text-body-base text-on-surface-variant">Enter patient metrics to evaluate risk using the Pima Indians Diabetes dataset parameters.</p>
+</div>
+<!-- Main Layout: Form (Grid 2-span) + Sidebar (Grid 1-span) on large screens -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter">
+<!-- Form Area (Spans 8 columns on large) -->
+<div class="lg:col-span-8 space-y-xl">
+<form class="space-y-xl">
+<!-- Demographic Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-sm mb-md border-b border-surface-container-high pb-sm">
+<span class="material-symbols-outlined text-secondary">person</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Demographic</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Age Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Age
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                Patient's age in years (must be ≥ 21 for this model).
+                                            </div>
+</div>
+</label>
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors" min="21" placeholder="e.g., 45" required="" type="number"/>
+</div>
+<!-- Pregnancies Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Pregnancies
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                Number of times pregnant.
+                                            </div>
+</div>
+</label>
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors" min="0" placeholder="e.g., 2" required="" type="number"/>
+</div>
+</div>
+</section>
+<!-- Vitals Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-sm mb-md border-b border-surface-container-high pb-sm">
+<span class="material-symbols-outlined text-secondary">vital_signs</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Vitals</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- BMI Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        BMI
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                Body mass index (weight in kg/(height in m)^2).
+                                            </div>
+</div>
+</label>
+<div class="relative">
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors pr-12" placeholder="e.g., 28.5" required="" step="0.1" type="number"/>
+<span class="absolute right-md top-1/2 transform -translate-y-1/2 text-caption font-caption text-outline-variant">kg/m²</span>
+</div>
+</div>
+<!-- Blood Pressure Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Blood Pressure (Diastolic)
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                Diastolic blood pressure (mm Hg).
+                                            </div>
+</div>
+</label>
+<div class="relative">
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors pr-16" placeholder="e.g., 72" required="" type="number"/>
+<span class="absolute right-md top-1/2 transform -translate-y-1/2 text-caption font-caption text-outline-variant">mm Hg</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Lab Results Section -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded-lg p-lg shadow-[0_1px_3px_0_rgba(0,0,0,0.05)]">
+<div class="flex items-center gap-sm mb-md border-b border-surface-container-high pb-sm">
+<span class="material-symbols-outlined text-secondary">science</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">Lab Results</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-md">
+<!-- Glucose Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Glucose
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                Plasma glucose concentration a 2 hours in an oral glucose tolerance test.
+                                            </div>
+</div>
+</label>
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors" placeholder="e.g., 148" required="" type="number"/>
+</div>
+<!-- Insulin Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Insulin
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                2-Hour serum insulin (mu U/ml).
+                                            </div>
+</div>
+</label>
+<div class="relative">
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors pr-16" placeholder="e.g., 0" required="" type="number"/>
+<span class="absolute right-md top-1/2 transform -translate-y-1/2 text-caption font-caption text-outline-variant">mu U/ml</span>
+</div>
+</div>
+<!-- Skin Thickness Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Skin Thickness
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                Triceps skin fold thickness (mm).
+                                            </div>
+</div>
+</label>
+<div class="relative">
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors pr-12" placeholder="e.g., 35" required="" type="number"/>
+<span class="absolute right-md top-1/2 transform -translate-y-1/2 text-caption font-caption text-outline-variant">mm</span>
+</div>
+</div>
+<!-- Diabetes Pedigree Function Input -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface-variant mb-xs flex items-center">
+                                        Diabetes Pedigree Function
+                                        <div class="tooltip-container relative ml-1 inline-flex cursor-help">
+<span class="material-symbols-outlined text-[16px] text-outline">help</span>
+<div class="tooltip absolute z-10 invisible opacity-0 bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-56 p-2 bg-inverse-surface text-inverse-on-surface text-caption font-caption rounded shadow-lg transition-opacity duration-200 text-center">
+                                                A function which scores likelihood of diabetes based on family history.
+                                            </div>
+</div>
+</label>
+<input class="custom-input w-full bg-surface-container-lowest border border-outline-variant rounded px-md py-sm text-body-base text-on-surface focus:outline-none transition-colors" placeholder="e.g., 0.627" required="" step="0.001" type="number"/>
+</div>
+</div>
+</section>
+<!-- Action Button -->
+<div class="flex justify-end pt-md">
+<button class="bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-headline-sm text-headline-sm px-xl py-3 rounded shadow-sm hover:shadow-md transition-all flex items-center gap-sm" type="submit">
+<span class="material-symbols-outlined text-[20px]">analytics</span>
+                                Analyze Risk Profile
+                            </button>
+</div>
+</form>
+</div>
+<!-- Sidebar Area (Spans 4 columns on large) -->
+<aside class="lg:col-span-4 mt-xl lg:mt-0">
+<div class="bg-surface-container-low border border-outline-variant rounded-lg p-lg sticky top-24">
+<div class="flex items-center gap-sm mb-md">
+<span class="material-symbols-outlined text-secondary text-[24px]">info</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">Model Info</h3>
+</div>
+<div class="space-y-md">
+<div class="bg-surface-container-lowest border border-surface-container-high rounded p-md">
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Algorithm</p>
+<p class="font-body-medium text-body-medium text-on-surface">Logistic Regression</p>
+</div>
+<div class="bg-surface-container-lowest border border-surface-container-high rounded p-md">
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Version</p>
+<p class="font-body-medium text-body-medium text-on-surface inline-flex items-center gap-xs">
+<span class="w-2 h-2 rounded-full bg-tertiary-fixed-dim"></span> v1.0.0 (Production)
+                                </p>
+</div>
+<div class="bg-surface-container-lowest border border-surface-container-high rounded p-md">
+<p class="font-label-md text-label-md text-on-surface-variant mb-xs">Dataset Context</p>
+<p class="font-body-base text-body-base text-on-surface-variant text-sm">
+                                    Trained on the Pima Indians Diabetes Database. All patients are females at least 21 years old of Pima Indian heritage. Ensure patient demography aligns with model constraints for optimal accuracy.
+                                </p>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest dark:bg-on-surface border-t border-outline-variant docked full-width bottom-0 mt-auto">
+<div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-desktop py-lg max-w-max-width mx-auto">
+<span class="font-caption text-caption text-on-surface-variant dark:text-outline-variant mb-sm md:mb-0">
+                © 2024 Health Risk Predictor. For clinical decision support only.
+            </span>
+<div class="flex gap-md font-label-md text-label-md text-on-surface">
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors focus:ring-2 focus:ring-primary-container rounded px-1" href="#">Documentation</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors focus:ring-2 focus:ring-primary-container rounded px-1" href="#">About HRP</a>
+<a class="text-on-surface-variant dark:text-outline-variant hover:text-primary dark:hover:text-primary-fixed transition-colors focus:ring-2 focus:ring-primary-container rounded px-1" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>
