@@ -28,17 +28,13 @@ export default function SignIn() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!validate()) return;
-    setLoginError("");
     setLoading(true);
-
+    // Demo mode: always authenticate
     const success = login(email, password);
     setLoading(false);
 
     if (success) {
       navigate("/");
-    } else {
-      setLoginError("Invalid email or password. Try admin / admin1234 for demo.");
     }
   }
 

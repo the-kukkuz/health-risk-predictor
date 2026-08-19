@@ -14,16 +14,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   function login(username: string, password: string): boolean {
-    // Hardcoded credentials for testing
-    // Accept "admin" as username or email (case-insensitive)
-    // Password must be "admin1234" (8+ characters to pass validation)
-    const normalized = username.toLowerCase().trim();
-    if ((normalized === "admin" || normalized.endsWith("@admin")) && password === "admin1234") {
-      setIsAuthenticated(true);
-      localStorage.setItem("hrp_auth", "true");
-      return true;
-    }
-    return false;
+    // Demo mode: always authenticate regardless of credentials
+    setIsAuthenticated(true);
+    localStorage.setItem("hrp_auth", "true");
+    return true;
   }
 
   function logout() {
