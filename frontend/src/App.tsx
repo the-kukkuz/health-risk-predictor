@@ -1,5 +1,6 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
 import Icon from "./components/Icon";
+import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
 import Analysis from "./pages/Analysis";
 import Dashboard from "./pages/Dashboard";
@@ -9,10 +10,11 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import TermsOfService from "./pages/TermsOfService";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DISCLAIMER } from "./config/diseases";
 
-// Persistent left-sidebar navigation shown once "logged in" (demo: always).
-// Not rendered on the Sign In / Sign Up routes.
+// Persistent left-sidebar navigation shown once "logged in".
+// Not rendered on the Sign In / Sign Up / Landing routes.
 const NAV_ITEMS = [
   { to: "/", label: "Home", icon: "home", end: true },
   { to: "/analysis", label: "Analysis", icon: "analytics", end: false },
@@ -125,15 +127,52 @@ function AppShell() {
   );
 }
 
+function ProtectedRoute({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background px-4">
+        <div className="text-center space-y-4 max-w-md">
+          <Icon name="lock" className="text-[48px] text-on-surface-variant" />
+          <div>
+            <h2 className="text-headline-lg text-on-surface">Authentication Required</h2>
+            <p className="text-body-base text-on-surface-variant mt-2">
+              Please sign in to access this page.
+            </p>
+          </div>
+          <Link
+            to="/signin"
+            className="btn-primary inline-flex"
+          >
+            <Icon name="login" className="text-[18px]" />
+            Sign In
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return <>{children}</>;
+}
+
 export default function App() {
   return (
-    <Routes>
-      <Route path="/signin" element={<SignIn />} />
-      <Route path="/signup" element={<SignUp />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/terms" element={<TermsOfService />} />
-      <Route path="/privacy" element={<PrivacyPolicy />} />
-      <Route path="/*" element={<AppShell />} />
-    </Routes>
+    <AuthProvider>
+      <Routes>
+        {/* Landing page — shown only when not authenticated */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        {/* Protected app routes — require authentication */}
+        <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
+        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} />
+      </Routes>
+    </AuthProvider>
   );
 }
