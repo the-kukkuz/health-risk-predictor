@@ -1,30 +1,69 @@
 # syntax=docker/dockerfile:1
-FROM python:3.12-slim AS base
+# NOTE: This Dockerfile uses the repo root as its build context.
+# Build via: docker compose build  (or)  docker build -f backend/Dockerfile .
+# Do NOT run: docker build . from inside the backend/ directory.
+
+# --- Build Stage ---
+FROM python:3.12-slim AS builder
+
+WORKDIR /app
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-WORKDIR /app
-
-# System deps needed by psycopg2 / shap / scikit-learn
+# Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential libpq-dev curl \
+    build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps first for better layer caching
-COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
 
-# Application code
-COPY app ./app
+# Install production dependencies
+COPY backend/requirements.txt .
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
-# Trained model artifact and dataset are mounted as volumes (see compose) so
-# the image does not need to be rebuilt on model retraining. In production you
-# may bake them in instead.
+# --- Runtime Stage ---
+FROM python:3.12-slim AS runtime
+
+WORKDIR /app
+
+# Install runtime system packages (curl for healthcheck, libpq5 for db driver)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    libpq5 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy ML models, training scripts/metadata, and datasets into the image
+# This makes the image self-contained for production environments (e.g. Azure Container Apps)
+COPY models /models
+COPY data /data
+COPY ml /ml
+
+# Copy application source code
+COPY backend/app ./app
+
+# Create a non-privileged user and group for runtime execution
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -m appuser && \
+    chown -R appuser:appgroup /app /models /data /ml
+
+USER appuser
+
+# Production environment variables
 ENV MODEL_DIR=/models/diabetes \
     DATA_DIR=/data/diabetes \
-    PYTHONPATH=/app
+    PYTHONPATH=/app \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 EXPOSE 8000
 
