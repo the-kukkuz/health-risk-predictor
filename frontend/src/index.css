@@ -81,4 +81,13 @@ body {
     @apply inline-flex items-center justify-center px-2.5 py-0.5 rounded-full
       text-label-md border;
   }
+
+  /* Slide-in animation for RAG chat panel */
+  @keyframes slide-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+  .animate-slide-in {
+    animation: slide-in 0.3s ease-out;
+  }
 }

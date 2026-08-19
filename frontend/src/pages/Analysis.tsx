@@ -18,6 +18,7 @@ type State =
 //   C. results (risk band + SHAP per selected condition, RAG chat available)
 export default function Analysis() {
   const [state, setState] = useState<State>({ kind: "select" });
+  const [loading, setLoading] = useState(false);
 
   const startEntry = (selected: string[]) =>
     setState({ kind: "entry", selected });
@@ -30,6 +31,8 @@ export default function Analysis() {
 
   const handleSubmit = async (valuesByDisease: Record<string, Record<string, number>>) => {
     if (state.kind !== "entry") return;
+
+    setLoading(true);
 
     // Fire parallel predictions for ALL selected diseases.
     const promises = state.selected.map(async (key) => {
@@ -70,6 +73,7 @@ export default function Analysis() {
       }
     }
 
+    setLoading(false);
     setState({
       kind: "results",
       selected: state.selected,
@@ -115,7 +119,7 @@ export default function Analysis() {
           {/* Single unified form for ALL selected diseases */}
           <AnalysisForm
             configs={selectedConfigs}
-            loading={false}
+            loading={loading}
             onSubmit={handleSubmit}
           />
         </div>

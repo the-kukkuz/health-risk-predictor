@@ -291,7 +291,7 @@ export default function LandingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-surface-container-lowest dark:bg-on-surface border-t border-outline-variant mt-auto">
+      <footer className="bg-surface-container-lowest border-t border-outline-variant mt-auto">
         <div className="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-lg max-w-max-width mx-auto gap-md">
           {/* Brand & Disclaimer */}
           <div className="flex flex-col items-center md:items-start gap-xs text-center md:text-left">
@@ -300,13 +300,13 @@ export default function LandingPage() {
           </div>
           {/* Links */}
           <div className="flex flex-wrap justify-center gap-md">
-            <a href="#" className="font-caption text-caption text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+            <a href="#" className="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors">
               Documentation
             </a>
-            <a href="#" className="font-caption text-caption text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+            <a href="#" className="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors">
               About HRP
             </a>
-            <a href="/privacy" className="font-caption text-caption text-on-surface-variant hover:text-primary dark:hover:text-primary-fixed transition-colors">
+            <a href="/privacy" className="font-caption text-caption text-on-surface-variant hover:text-primary transition-colors">
               Privacy Policy
             </a>
           </div>
