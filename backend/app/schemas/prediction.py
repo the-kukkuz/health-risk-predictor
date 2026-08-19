@@ -60,6 +60,23 @@ class DiabetesFeatures(BaseModel):
     DiabetesPedigreeFunction: float = Field(..., ge=0, le=5, description="Diabetes pedigree function")
     Age: float = Field(..., ge=0, le=120, description="Age (years)")
 
+class HeartFeatures(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    age: float = Field(..., ge=0, le=120, description="Age in years")
+    sex: float = Field(..., ge=0, le=1, description="Biological sex")
+    cp: float = Field(..., ge=1, le=4, description="Chest pain type")
+    trestbps: float = Field(..., ge=0, le=300, description="Resting blood pressure")
+    chol: float = Field(..., ge=0, le=600, description="Serum cholesterol")
+    fbs: float = Field(..., ge=0, le=1, description="Fasting blood sugar > 120 mg/dl")
+    restecg: float = Field(..., ge=0, le=2, description="Resting ECG results")
+    thalach: float = Field(..., ge=0, le=250, description="Max heart rate")
+    exang: float = Field(..., ge=0, le=1, description="Exercise induced angina")
+    oldpeak: float = Field(..., ge=0, le=15, description="ST depression induced by exercise")
+    slope: float = Field(..., ge=1, le=3, description="Slope of the peak exercise ST segment")
+    ca: float = Field(..., ge=0, le=4, description="Number of major vessels")
+    thal: float = Field(..., ge=3, le=7, description="Thalassemia")
+
 
 # --------------------------------------------------------------------------
 # Common prediction response (disease-agnostic)

@@ -30,7 +30,7 @@ export const DISEASES: Record<string, DiseaseConfig> = {
     title: "Heart Disease Risk Assessment",
     subtitle:
       "Estimate heart disease risk from clinical features using the trained model.",
-    apiDisease: "heart_disease",
+    apiDisease: "heart",
     resultLabels: {
       positive: "Heart disease risk indicated",
       negative: "No heart disease risk indicated",
