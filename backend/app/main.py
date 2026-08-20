@@ -27,6 +27,7 @@ from app.api.routes import (
 )
 from app.core.config import get_settings
 from app.db.session import Base, engine
+from app.models import PredictionRecord, User  # noqa: F401  (register all tables)
 from app.services.registry import register_all_services
 
 logging.basicConfig(

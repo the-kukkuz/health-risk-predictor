@@ -1,4 +1,8 @@
+"""FastAPI authentication dependencies using Supabase Auth."""
+from __future__ import annotations
+
 import os
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from supabase import create_client, Client, ClientOptions
@@ -11,7 +15,10 @@ supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY, options=option
 
 security = HTTPBearer()
 
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+
+async def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security),
+):
     token = credentials.credentials
     try:
         # Validate token against Supabase Auth engine
