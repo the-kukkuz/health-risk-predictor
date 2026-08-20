@@ -33,6 +33,9 @@ services:
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      QDRANT_URL: ${QDRANT_URL}
+      QDRANT_API_KEY: ${QDRANT_API_KEY}
     volumes:
       # Mount the trained model + data so retraining doesn't require rebuild.
       - ./models:/models:ro

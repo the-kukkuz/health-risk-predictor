@@ -55,7 +55,7 @@ export default function InlineChat({ context, startCollapsed = true }: Props) {
     }
   }, [messages, open]);
 
-  function send(text?: string) {
+  async function send(text?: string) {
     const userMessage = (text ?? input).trim();
     if (!userMessage || isTyping) return;
     setInput("");
@@ -63,16 +63,33 @@ export default function InlineChat({ context, startCollapsed = true }: Props) {
     setMessages((m) => [...m, { role: "user", text: userMessage }]);
     setIsTyping(true);
 
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/v1/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: userMessage, context }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Chat request failed (${response.status})`);
+      }
+
+      const data = await response.json();
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", text: data.message || "I couldn't generate a response." },
+      ]);
+    } catch {
       setMessages((m) => [
         ...m,
         {
           role: "assistant",
-          text: "This is a placeholder response. The RAG Q&A layer will be connected to the clinical knowledge base. I'll be able to give detailed, evidence-based answers about this specific result.",
+          text: "I'm sorry, I couldn't reach the assistant right now. Please try again in a moment.",
         },
       ]);
+    } finally {
       setIsTyping(false);
-    }, 900);
+    }
   }
 
   return (
