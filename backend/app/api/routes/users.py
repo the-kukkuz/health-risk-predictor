@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.api.deps import get_current_user, supabase
 from app.schemas.user import UserProfileResponse
 
-router = APIRouter(prefix="/users", tags=["Users"])
+router = APIRouter(prefix="/api/v1/users", tags=["Users"])
 
 @router.get("/me", response_model=UserProfileResponse)
 async def get_my_profile(current_user = Depends(get_current_user)):

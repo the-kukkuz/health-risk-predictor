@@ -26,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Fetch profile details for the authenticated user
   const fetchProfile = async (token: string) => {
     try {
-      const response = await fetch("/users/me", {
+      const response = await fetch("/api/v1/users/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -1,7 +1,32 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon";
+import { getPredictions } from "../services/api";
 
 export default function Home() {
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getPredictions()
+      .then((data) => {
+        setHistoryItems(data.items || []);
+      })
+      .catch((err) => {
+        console.error("Failed to load overview data:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const totalCount = historyItems.length;
+  const avgRisk = totalCount > 0
+    ? (historyItems.reduce((sum, item) => sum + item.probability, 0) / totalCount * 100).toFixed(1) + "%"
+    : "0.0%";
+  const highRiskCount = historyItems.filter(item => item.risk_band === "High").length;
+  const recent = historyItems.slice(0, 3);
+
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Page header */}
@@ -46,12 +71,21 @@ export default function Home() {
         <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
           Session Summary
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <StatCard label="Total Assessments" value="1,248" />
-          <StatCard label="Avg. Risk Score" value="38.4%" />
-          <StatCard label="High Risk Flagged" value="84" highlight />
-          <StatCard label="Model Precision" value="94.2%" />
-        </div>
+        {loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="skeleton h-20 rounded-lg" />
+            <div className="skeleton h-20 rounded-lg" />
+            <div className="skeleton h-20 rounded-lg" />
+            <div className="skeleton h-20 rounded-lg" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <StatCard label="Total Assessments" value={totalCount} />
+            <StatCard label="Avg. Risk Score" value={avgRisk} />
+            <StatCard label="High Risk Flagged" value={highRiskCount} highlight={highRiskCount > 0} />
+            <StatCard label="Model Precision" value="94.2%" />
+          </div>
+        )}
       </section>
 
       {/* Recent assessments */}
@@ -76,9 +110,45 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              <HistoryRow disease="Diabetes Risk Model" score="78.4%" band="High" date="Aug 20, 2026" />
-              <HistoryRow disease="Heart Disease Model" score="24.0%" band="Low" date="Aug 19, 2026" />
-              <HistoryRow disease="Diabetes Risk Model" score="51.2%" band="Moderate" date="Aug 18, 2026" />
+              {loading ? (
+                <tr>
+                  <td colSpan={4} className="px-5 py-8 text-center text-gray-400 text-sm">
+                    Loading assessments...
+                  </td>
+                </tr>
+              ) : (
+                recent.map((item) => {
+                  const diseaseLabel = item.disease_type === "diabetes" ? "Diabetes Risk Model" : "Heart Disease Model";
+                  const formattedDate = item.created_at
+                    ? new Date(item.created_at).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })
+                    : "Unknown";
+                  return (
+                    <tr key={item.id} className="hover:bg-gray-50/50 transition-colors">
+                      <td className="px-5 py-3.5 font-medium text-gray-900">{diseaseLabel}</td>
+                      <td className="px-5 py-3.5 font-mono text-gray-700">{(item.probability * 100).toFixed(1)}%</td>
+                      <td className="px-5 py-3.5">
+                        <span className={`chip ${
+                          item.risk_band === "High" ? "risk-high" : item.risk_band === "Moderate" ? "risk-mod" : "risk-low"
+                        }`}>
+                          {item.risk_band}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3.5 text-gray-500">{formattedDate}</td>
+                    </tr>
+                  );
+                })
+              )}
+              {!loading && recent.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-5 py-8 text-center text-gray-400 text-sm">
+                    No assessments run yet.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -142,7 +212,7 @@ function StatCard({
   highlight = false,
 }: {
   label: string;
-  value: string;
+  value: string | number;
   highlight?: boolean;
 }) {
   return (
