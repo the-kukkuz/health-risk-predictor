@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect } from "react";
+import ReactMarkdown from "react-markdown";
+const Markdown = ReactMarkdown as React.ComponentType<any>;
 import Icon from "./Icon";
 
 interface Message {
@@ -149,14 +151,18 @@ export default function InlineChat({ context, startCollapsed = true }: Props) {
               </div>
             )}
             <div
-              className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
-                m.role === "user"
-                  ? "bg-[#1d4ed8] text-white rounded-br-sm"
-                  : "bg-surface-container-lowest border border-outline-variant text-on-surface rounded-bl-sm shadow-card"
-              }`}
-            >
-              {m.text}
-            </div>
+  className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+    m.role === "user"
+      ? "bg-[#1d4ed8] text-white rounded-br-sm"
+      : "bg-surface-container-lowest border border-outline-variant text-on-surface rounded-bl-sm shadow-card prose prose-sm max-w-none prose-ul:list-disc prose-ul:pl-4 prose-p:my-1"
+  }`}
+>
+  {m.role === "user" ? (
+    m.text
+  ) : (
+    <Markdown>{m.text}</Markdown>
+  )}
+</div>
             {m.role === "user" && (
               <div className="w-7 h-7 rounded-full bg-surface-container flex items-center justify-center shrink-0 mt-0.5">
                 <Icon name="person" className="text-on-surface-variant text-[14px]" />

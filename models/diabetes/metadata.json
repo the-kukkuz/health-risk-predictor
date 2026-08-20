@@ -17,7 +17,7 @@
     "DiabetesPedigreeFunction",
     "Age"
   ],
-  "training_date": "2026-08-20 15:26:23",
+  "training_date": "2026-08-21 00:49:25",
   "random_state": 42,
   "cv_folds": 5,
   "test_size": 0.2,
@@ -113,19 +113,19 @@
     },
     "random_forest": {
       "threshold": 0.35,
-      "accuracy": 0.6743,
-      "precision": 0.5193,
-      "recall": 0.8785,
-      "f1": 0.6528,
-      "roc_auc": 0.8358
+      "accuracy": 0.6661,
+      "precision": 0.5123,
+      "recall": 0.8738,
+      "f1": 0.6459,
+      "roc_auc": 0.8318
     },
     "gradient_boosting": {
       "threshold": 0.2,
-      "accuracy": 0.6987,
-      "precision": 0.5452,
-      "recall": 0.8178,
-      "f1": 0.6542,
-      "roc_auc": 0.8119
+      "accuracy": 0.7085,
+      "precision": 0.5545,
+      "recall": 0.8318,
+      "f1": 0.6654,
+      "roc_auc": 0.8203
     }
   },
   "test_metrics": {
