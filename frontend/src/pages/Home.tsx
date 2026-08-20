@@ -1,72 +1,84 @@
 import { Link } from "react-router-dom";
 import Icon from "../components/Icon";
 
-// Home: platform overview, "Start Assessment" CTA, recent history preview.
-// Design-first: stat values are illustrative placeholders to be wired later.
 export default function Home() {
   return (
-    <div className="flex flex-col gap-8">
-      {/* Welcome banner */}
-      <section className="card p-6 flex items-center justify-between overflow-hidden relative">
-        <div className="relative z-10">
-          <h1 className="text-display-lg text-on-surface">
-            Welcome back
-          </h1>
-          <p className="text-body-base text-on-surface-variant mt-1">
-            Estimate diabetes and heart disease risk from clinical inputs using
-            explainable machine-learning models.
-          </p>
-          <Link
-            to="/analysis"
-            className="btn-primary mt-5"
-          >
-            <Icon name="add" className="text-[18px]" />
-            Start Assessment
-          </Link>
+    <div className="space-y-8 animate-fade-in">
+      {/* Page header */}
+      <div className="page-header">
+        <h1 className="text-xl font-bold tracking-tight text-gray-900">Overview</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Clinical diabetes and heart disease risk stratification powered by machine learning and SHAP explanations.
+        </p>
+      </div>
+
+      {/* Risk models */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Available Models
+          </h2>
         </div>
-        <div className="hidden sm:block text-primary opacity-20">
-          <Icon name="health_and_safety" className="text-[120px]" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ModelCard
+            to="/analysis?disease=diabetes"
+            title="Diabetes Risk Model"
+            tag="Scikit-learn"
+            inputs="8 clinical inputs"
+            description="Evaluates glucose, BMI, blood pressure, insulin, skin thickness, pregnancies, pedigree, and age."
+            icon="bloodtype"
+            iconBg="bg-blue-50 text-blue-600"
+          />
+          <ModelCard
+            to="/analysis?disease=heart"
+            title="Heart Disease Risk Model"
+            tag="Gradient Boosting"
+            inputs="11 clinical inputs"
+            description="Evaluates chest pain type, resting BP, cholesterol, fasting blood sugar, ECG metrics, and max heart rate."
+            icon="favorite"
+            iconBg="bg-rose-50 text-rose-600"
+          />
         </div>
       </section>
 
-      {/* Platform stats */}
-      <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard icon="analytics" label="Total Predictions" value="1,248" note="+12% from last month" />
-        <StatCard icon="percent" label="Avg. Risk Probability" value="42.5%" note="Stable across cohorts" />
-        <StatCard
-          icon="warning"
-          label="High Risk Alerts"
-          value="84"
-          note="Requires immediate review"
-          alert
-        />
+      {/* Summary stats */}
+      <section>
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+          Session Summary
+        </h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <StatCard label="Total Assessments" value="1,248" />
+          <StatCard label="Avg. Risk Score" value="38.4%" />
+          <StatCard label="High Risk Flagged" value="84" highlight />
+          <StatCard label="Model Precision" value="94.2%" />
+        </div>
       </section>
 
-      {/* Recent history preview */}
-      <section className="card overflow-hidden">
-        <div className="px-5 py-4 border-b border-outline-variant bg-surface-container-low/50 flex items-center justify-between">
-          <h3 className="text-headline-sm text-on-surface">Recent Assessments</h3>
-          <Link
-            to="/history"
-            className="text-label-md text-primary hover:underline"
-          >
-            View All
+      {/* Recent assessments */}
+      <section>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+            Recent Assessments
+          </h2>
+          <Link to="/history" className="text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+            View history →
           </Link>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead className="bg-surface-container font-label-md text-on-surface-variant">
-              <tr>
-                <th className="p-3 font-medium">Disease</th>
-                <th className="p-3 font-medium">Risk Band</th>
-                <th className="p-3 font-medium">Date</th>
-                <th className="p-3 font-medium text-right">Action</th>
+
+        <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
+          <table className="w-full text-sm text-left">
+            <thead>
+              <tr className="border-b border-gray-200/80 bg-gray-50/60">
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Model</th>
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk Score</th>
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk Level</th>
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-outline-variant/50">
-              <HistoryRow disease="Diabetes" band="High" date="Aug 18, 2026" />
-              <HistoryRow disease="Diabetes" band="Low" date="Aug 17, 2026" />
-              <HistoryRow disease="Heart Disease" band="Moderate" date="Aug 16, 2026" />
+            <tbody className="divide-y divide-gray-100">
+              <HistoryRow disease="Diabetes Risk Model" score="78.4%" band="High" date="Aug 20, 2026" />
+              <HistoryRow disease="Heart Disease Model" score="24.0%" band="Low" date="Aug 19, 2026" />
+              <HistoryRow disease="Diabetes Risk Model" score="51.2%" band="Moderate" date="Aug 18, 2026" />
             </tbody>
           </table>
         </div>
@@ -75,66 +87,102 @@ export default function Home() {
   );
 }
 
-function StatCard({
+function ModelCard({
+  to,
+  title,
+  tag,
+  inputs,
+  description,
   icon,
-  label,
-  value,
-  note,
-  alert = false,
+  iconBg,
 }: {
+  to: string;
+  title: string;
+  tag: string;
+  inputs: string;
+  description: string;
   icon: string;
-  label: string;
-  value: string;
-  note: string;
-  alert?: boolean;
+  iconBg: string;
 }) {
   return (
-    <div className="card p-5 flex flex-col gap-1">
-      <div
-        className={`flex items-center justify-between ${
-          alert ? "text-error" : "text-on-surface-variant"
-        }`}
-      >
-        <span className="text-label-md">{label}</span>
-        <Icon name={icon} className="text-[18px]" />
+    <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm hover:border-gray-300 transition-all flex flex-col justify-between group">
+      <div>
+        <div className="flex items-center gap-3 mb-3">
+          <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${iconBg}`}>
+            <Icon name={icon} className="text-[18px]" />
+          </div>
+          <div>
+            <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+              {title}
+            </h3>
+            <p className="text-xs text-gray-400 font-medium">
+              {tag} · {inputs}
+            </p>
+          </div>
+        </div>
+        <p className="text-xs text-gray-500 leading-relaxed mb-4">{description}</p>
       </div>
-      <div className={`text-display-lg ${alert ? "text-error" : "text-on-surface"}`}>
+
+      <div className="flex justify-end pt-2 border-t border-gray-100">
+        <Link
+          to={to}
+          className="btn-primary text-xs py-1.5 px-3.5 rounded-md font-semibold inline-flex items-center gap-1.5"
+        >
+          Run Assessment
+          <Icon name="arrow_forward" className="text-[14px]" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  highlight = false,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+}) {
+  return (
+    <div className="bg-white px-4 py-4 rounded-lg border border-gray-200 shadow-sm">
+      <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
+      <p className={`text-2xl font-bold tracking-tight ${highlight ? "text-amber-600" : "text-gray-900"}`}>
         {value}
-      </div>
-      <div className={`text-caption ${alert ? "text-error" : "text-on-surface-variant"}`}>
-        {note}
-      </div>
+      </p>
     </div>
   );
 }
 
 function HistoryRow({
   disease,
+  score,
   band,
   date,
 }: {
   disease: string;
+  score: string;
   band: "High" | "Moderate" | "Low";
   date: string;
 }) {
-  const chip =
+  const chipClass =
     band === "High"
-      ? "bg-error/10 text-error border-error/20"
+      ? "bg-rose-50 text-rose-700 border-rose-200/60"
       : band === "Moderate"
-      ? "bg-secondary/10 text-secondary border-secondary/20"
-      : "bg-tertiary/10 text-tertiary border-tertiary/20";
+      ? "bg-amber-50 text-amber-700 border-amber-200/60"
+      : "bg-emerald-50 text-emerald-700 border-emerald-200/60";
+
   return (
-    <tr className="hover:bg-surface-container-low transition-colors">
-      <td className="p-3 text-body-base text-on-surface">{disease}</td>
-      <td className="p-3">
-        <span className={`chip ${chip}`}>{band}</span>
+    <tr className="hover:bg-gray-50/50 transition-colors">
+      <td className="px-5 py-3.5 text-gray-900 font-medium">{disease}</td>
+      <td className="px-5 py-3.5 font-semibold text-gray-800">{score}</td>
+      <td className="px-5 py-3.5">
+        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold border ${chipClass}`}>
+          {band}
+        </span>
       </td>
-      <td className="p-3 text-body-base text-on-surface-variant">{date}</td>
-      <td className="p-3 text-right">
-        <Link to="/history" className="text-label-md text-primary hover:underline">
-          View Details
-        </Link>
-      </td>
+      <td className="px-5 py-3.5 text-gray-400 text-xs font-medium">{date}</td>
     </tr>
   );
 }

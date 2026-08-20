@@ -1,35 +1,30 @@
-import Icon from "./Icon";
-
 interface Props {
   title: string;
   subtitle: string;
   children: React.ReactNode;
 }
 
-// Shared layout for auth pages (Sign In / Sign Up). Centered card on the
-// background canvas with brand logo, title, subtitle, and footer disclaimer.
-// Used by both SignIn and SignUp so they stay visually consistent.
 export default function AuthLayout({ title, subtitle, children }: Props) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md">
-        {/* Brand header */}
-        <div className="flex items-center gap-3 justify-center mb-6">
-          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-on-primary">
-            <Icon name="ecg" className="text-[20px]" />
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-12">
+      <div className="w-full max-w-sm">
+        {/* Brand mark */}
+        <div className="flex items-center gap-2.5 justify-center mb-8">
+          <div className="w-7 h-7 rounded bg-blue-600 flex items-center justify-center">
+            <span className="text-white text-xs font-bold leading-none">HR</span>
           </div>
-          <span className="text-headline-md text-primary">Health Risk Predictor</span>
+          <span className="text-sm font-semibold text-gray-800">Health Risk Predictor</span>
         </div>
 
         {/* Card */}
         <div className="card p-8">
-          <h1 className="text-headline-lg text-on-surface">{title}</h1>
-          <p className="text-body-base text-on-surface-variant mt-1 mb-6">{subtitle}</p>
+          <h1 className="text-lg font-semibold text-gray-900 mb-1">{title}</h1>
+          <p className="text-sm text-gray-500 mb-6">{subtitle}</p>
           {children}
         </div>
 
-        {/* Footer disclaimer */}
-        <p className="text-center text-caption text-on-surface-variant mt-6">
+        {/* Footer note */}
+        <p className="text-center text-xs text-gray-400 mt-5">
           For clinical decision support only. Not a diagnostic tool.
         </p>
       </div>

@@ -1,6 +1,10 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ─── Base ──────────────────────────────────────────────────── */
 
 html {
   scroll-behavior: smooth;
@@ -14,13 +18,25 @@ body,
 
 body {
   margin: 0;
-  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
-  background-color: #faf8ff;
-  color: #131b2e;
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  background-color: #f9fafb;
+  color: #111827;
   -webkit-font-smoothing: antialiased;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
-/* Material Symbols icon helper */
+/* ─── Typography ─────────────────────────────────────────────── */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #111827;
+}
+
+/* ─── Icon helper ────────────────────────────────────────────── */
+
 .icon {
   font-family: "Material Symbols Outlined";
   font-weight: normal;
@@ -33,88 +49,151 @@ body {
   word-wrap: normal;
   direction: ltr;
   user-select: none;
+  vertical-align: middle;
 }
 
-/* Focus-visible ring for keyboard nav */
+/* ─── Focus ring ─────────────────────────────────────────────── */
+
 :focus-visible {
-  outline: 2px solid #0037b0;
+  outline: 2px solid #2563eb;
   outline-offset: 2px;
   border-radius: 4px;
 }
 
+/* ─── Scrollbar ──────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #9ca3af; }
+
+/* ─── Components ─────────────────────────────────────────────── */
+
 @layer components {
-  /* Primary content surface: white card on the slate canvas */
+
+  /* Surface card — minimal, no hover lift */
   .card {
-    @apply bg-surface-container-lowest border border-outline-variant rounded-xl shadow-card;
+    @apply bg-white border border-gray-200 rounded-lg;
   }
 
-  /* Primary action button — solid blue (#1d4ed8) with white text */
+  /* Primary action button — solid blue, no gradient */
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-[#1d4ed8] px-4 py-2
-      text-sm font-medium text-white shadow-card transition
-      hover:bg-primary hover:shadow-card-hover
-      disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-md
+      bg-blue-600 px-4 py-2 text-sm font-medium text-white
+      transition-colors duration-150
+      hover:bg-blue-700 active:bg-blue-800
+      disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   /* Secondary / outline button */
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-surface-container-lowest
-      border border-outline-variant px-4 py-2 text-sm font-medium text-on-surface
-      shadow-card transition hover:bg-surface-container-low disabled:opacity-50
-      disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 rounded-md
+      bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700
+      transition-colors duration-150
+      hover:bg-gray-50 hover:border-gray-400 active:bg-gray-100
+      disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  /* Ghost/text button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5
+      px-2 py-1.5 text-sm font-medium text-gray-600 rounded-md
+      transition-colors duration-150
+      hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200;
+  }
+
+  /* Danger button */
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 rounded-md
+      bg-red-600 px-4 py-2 text-sm font-medium text-white
+      transition-colors duration-150
+      hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed;
   }
 
   /* Text input */
   .input-field {
-    @apply block w-full rounded-lg border border-outline-variant bg-surface-container-lowest
-      px-3 py-2 text-sm text-on-surface shadow-sm outline-none transition
-      focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-outline;
+    @apply block w-full rounded-md border border-gray-300 bg-white
+      px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400
+      outline-none transition-colors duration-150
+      focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20;
   }
 
-  /* Select dropdown */
+  /* Select */
   .select-field {
-    @apply block w-full rounded-lg border border-outline-variant bg-surface-container-lowest
-      px-3 py-2 text-sm text-on-surface shadow-sm outline-none transition appearance-none
-      focus:border-primary focus:ring-2 focus:ring-primary/20;
+    @apply block w-full rounded-md border border-gray-300 bg-white
+      px-3 py-2 text-sm text-gray-900
+      outline-none transition-colors duration-150 appearance-none
+      focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20;
   }
 
   /* Field label */
   .label-field {
-    @apply block text-sm font-medium text-on-surface-variant mb-1;
+    @apply block text-xs font-medium text-gray-600 mb-1;
   }
 
-  /* Field hint / helper text */
+  /* Field hint */
   .hint {
-    @apply mt-1 text-xs text-on-surface-variant;
+    @apply mt-1 text-xs text-gray-500;
   }
 
-  /* Risk status chip */
+  /* Error text */
+  .field-error {
+    @apply mt-1 text-xs text-red-600;
+  }
+
+  /* Risk band badge — small, solid border, tight radius */
   .chip {
-    @apply inline-flex items-center justify-center px-2.5 py-0.5 rounded-full
-      text-xs font-medium border;
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium border;
   }
 
-  /* Slide-in animation for legacy panels */
-  @keyframes slide-in {
-    from { transform: translateX(100%); }
-    to { transform: translateX(0); }
-  }
-  .animate-slide-in {
-    animation: slide-in 0.3s ease-out;
+  /* Risk colors — solid, no gradients */
+  .risk-high   { @apply text-red-700 bg-red-50 border-red-200; }
+  .risk-mod    { @apply text-amber-700 bg-amber-50 border-amber-200; }
+  .risk-low    { @apply text-green-700 bg-green-50 border-green-200; }
+
+  /* Section divider */
+  .section-divider {
+    @apply border-t border-gray-200 pt-6 mt-6;
   }
 
-  /* Chat panel open animation (scale + fade from bottom) */
-  @keyframes chat-open {
-    from {
-      opacity: 0;
-      transform: translateY(12px) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+  /* Page header — title + subtitle */
+  .page-header {
+    @apply mb-8;
   }
-  .animate-chat-open {
-    animation: chat-open 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  .page-title {
+    @apply text-xl font-bold tracking-tight text-gray-900;
+  }
+  .page-subtitle {
+    @apply mt-1 text-sm text-gray-500;
+  }
+
+  /* Fade in */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.2s ease-out forwards;
+  }
+
+  /* Skeleton shimmer */
+  @keyframes shimmer {
+    from { background-position: -200% 0; }
+    to   { background-position: 200% 0; }
+  }
+  .skeleton {
+    @apply rounded bg-gray-200;
+    background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
+  /* Hide native number input spinners — unit labels sit in that space */
+  .no-spinner::-webkit-outer-spin-button,
+  .no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .no-spinner[type=number] {
+    -moz-appearance: textfield;
   }
 }

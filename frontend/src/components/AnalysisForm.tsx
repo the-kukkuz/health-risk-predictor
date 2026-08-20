@@ -12,9 +12,6 @@ interface Props {
 // form with ONE submit button. Fields are grouped into sections (Demographic,
 // Vitals, Lab Results) preserving config order.
 export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
-  // Merge all fields from all configs into a single flat list.
-  // Deduplicate by (name.toLowerCase(), group) so that diabetes "Age" and
-  // heart "age" are treated as the same field. (Issue #3 — duplicate Age fix)
   const allFields = useMemo(() => {
     const seen = new Set<string>();
     const merged: FieldDef[] = [];
@@ -30,7 +27,6 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
     return merged;
   }, [configs]);
 
-  // Initialize form state with defaults from the first config that defines each field.
   const [values, setValues] = useState<Record<string, number>>(() => {
     const init: Record<string, number> = {};
     for (const f of allFields) {
@@ -40,16 +36,12 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Group fields by section, preserving order.
   const groups: Record<string, FieldDef[]> = {};
   allFields.forEach((f) => {
     const g = f.group ?? "Other";
     (groups[g] = groups[g] ?? []).push(f);
   });
 
-  // Determine if the currently-selected sex is Male (value = 1).
-  // "sex" field appears in the heart disease config (Demographic group).
-  // When Male is selected, Pregnancies doesn't apply. (Issue #3 — pregnancies fix)
   const sexFieldName = allFields.find(
     (f) => f.name.toLowerCase() === "sex"
   )?.name;
@@ -72,10 +64,10 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
   function validate(): boolean {
     const errs: Record<string, string> = {};
     allFields.forEach((f) => {
-      if (isFieldDisabled(f)) return; // skip disabled fields
+      if (isFieldDisabled(f)) return;
       const v = values[f.name];
       if (f.type === "number") {
-        if (Number.isNaN(v)) errs[f.name] = "Required numeric value";
+        if (Number.isNaN(v)) errs[f.name] = "Required";
         else if (f.min !== undefined && v < f.min) errs[f.name] = `Min ${f.min}`;
         else if (f.max !== undefined && v > f.max) errs[f.name] = `Max ${f.max}`;
       }
@@ -88,20 +80,16 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
     e.preventDefault();
     if (!validate()) return;
 
-    // Partition flat values into per-disease objects matching each backend schema.
-    // For heart disease, map shared "Age" → "age" if the backend key differs.
     const valuesByDisease: Record<string, Record<string, number>> = {};
     for (const cfg of configs) {
       const diseaseValues: Record<string, number> = {};
       for (const f of cfg.fields) {
-        // Look up value by exact name first, then case-insensitive fallback
         const val =
           f.name in values
             ? values[f.name]
             : (Object.entries(values).find(
                 ([k]) => k.toLowerCase() === f.name.toLowerCase()
               )?.[1] ?? f.default);
-        // For disabled fields (e.g. Pregnancies when Male), send 0
         const disabled = f.name === "Pregnancies" && isMale;
         diseaseValues[f.name] = disabled ? 0 : val;
       }
@@ -110,21 +98,15 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
     onSubmit(valuesByDisease);
   }
 
-  const sectionIcons: Record<string, string> = {
-    Demographic: "person",
-    Vitals: "vital_signs",
-    "Lab Results": "science",
-  };
-
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {Object.entries(groups).map(([g, fields]) => (
-        <section key={g} className="card p-5">
-          <div className="flex items-center gap-2 mb-4 border-b border-outline-variant pb-3">
-            <Icon name={sectionIcons[g] ?? "info"} className="text-secondary text-[18px]" />
-            <h2 className="text-headline-md text-on-surface">{g}</h2>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {Object.entries(groups).map(([g, fields], idx) => (
+        <section key={g}>
+          {idx > 0 && <div className="section-divider mb-0" />}
+          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">
+            {g}
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
             {fields.map((f) => {
               const disabled = isFieldDisabled(f);
               return (
@@ -132,16 +114,17 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
                   <label className="label-field" htmlFor={f.name}>
                     {f.label}
                     {disabled && (
-                      <span className="ml-2 text-[10px] font-normal text-on-surface-variant/60 normal-case">
-                        (N/A for Male)
+                      <span className="ml-1.5 text-[10px] font-normal text-gray-400 normal-case">
+                        (N/A for male)
                       </span>
                     )}
                   </label>
+
                   {f.type === "select" ? (
                     <div className="relative">
                       <select
                         id={f.name}
-                        className="select-field"
+                        className="select-field pr-8"
                         value={values[f.name]}
                         onChange={(e) => setField(f, e.target.value)}
                         disabled={disabled}
@@ -154,7 +137,7 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
                       </select>
                       <Icon
                         name="arrow_drop_down"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none text-[18px]"
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[18px]"
                       />
                     </div>
                   ) : (
@@ -162,7 +145,15 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
                       <input
                         id={f.name}
                         type="number"
-                        className="input-field"
+                        className={`input-field no-spinner ${
+                          f.unit
+                            ? f.unit.length > 4
+                              ? "pr-16"
+                              : "pr-12"
+                            : ""
+                        } ${
+                          errors[f.name] ? "border-red-400 focus:border-red-500 focus:ring-red-500/20" : ""
+                        }`}
                         min={f.min}
                         max={f.max}
                         step={f.step}
@@ -172,14 +163,15 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
                         disabled={disabled}
                       />
                       {f.unit && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-caption text-outline-variant">
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none select-none whitespace-nowrap">
                           {f.unit}
                         </span>
                       )}
                     </div>
                   )}
+
                   {errors[f.name] ? (
-                    <p className="mt-1 text-xs text-error">{errors[f.name]}</p>
+                    <p className="field-error">{errors[f.name]}</p>
                   ) : (
                     f.hint && !disabled && <p className="hint">{f.hint}</p>
                   )}
@@ -190,10 +182,22 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
         </section>
       ))}
 
-      <div className="flex justify-end pt-2">
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+        <p className="text-xs text-gray-400">
+          All fields are required unless marked N/A
+        </p>
         <button type="submit" className="btn-primary" disabled={loading}>
-          <Icon name="analytics" className="text-[18px]" />
-          {loading ? "Analyzing..." : "Analyze Risk Profile"}
+          {loading ? (
+            <>
+              <span className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Analyzing…
+            </>
+          ) : (
+            <>
+              <Icon name="analytics" className="text-[16px]" />
+              Analyze risk
+            </>
+          )}
         </button>
       </div>
     </form>

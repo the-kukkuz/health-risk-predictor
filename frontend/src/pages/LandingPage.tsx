@@ -1,8 +1,5 @@
 import { Link } from "react-router-dom";
-import Icon from "../components/Icon";
 
-// Sample SHAP data for diabetes features (based on actual model output)
-// Declared here (above component) to avoid TDZ / hoisting issues with const.
 const shapData = [
   { feature: "Glucose", shapValue: 0.35 },
   { feature: "BMI", shapValue: 0.28 },
@@ -10,282 +7,200 @@ const shapData = [
   { feature: "Pregnancies", shapValue: 0.15 },
   { feature: "SkinThickness", shapValue: 0.12 },
   { feature: "Insulin", shapValue: -0.08 },
-  { feature: "DiabetesPedigreeFunction", shapValue: 0.05 },
+  { feature: "DiabetesPedigree", shapValue: 0.05 },
   { feature: "BloodPressure", shapValue: -0.03 },
 ];
 
-const HOW_IT_WORKS = [
-  {
-    icon: "data_usage",
-    title: "1. Enter Data",
-    desc: "Input relevant health metrics securely.",
-  },
-  {
-    icon: "analytics",
-    title: "2. Get Estimate",
-    desc: "Receive an explained risk assessment.",
-  },
-  {
-    icon: "forum",
-    title: "3. Ask Questions",
-    desc: "Clarify results with interactive support.",
-  },
-  {
-    icon: "monitoring",
-    title: "4. Track Results",
-    desc: "Monitor changes over time to measure progress.",
-  },
-];
+const maxAbs = Math.max(...shapData.map((d) => Math.abs(d.shapValue)));
 
-// Landing page — shown at "/" before auth. Matches design in docs/landingpage/.
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen bg-background">
-      {/* ── Top Nav ─────────────────────────────────────────── */}
-      <header className="bg-surface-container-lowest border-b border-outline-variant shadow-sm w-full sticky top-0 z-50">
-        <div className="flex justify-between items-center h-14 px-4 md:px-8 max-w-[1280px] mx-auto">
-          {/* Brand */}
-          <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-primary text-[22px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-              health_and_safety
-            </span>
-            <span className="text-headline-sm text-primary tracking-tight font-semibold">
-              Health Risk Predictor
-            </span>
+    <div className="min-h-screen bg-white text-gray-900">
+      {/* Header */}
+      <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
+        <div className="max-w-5xl mx-auto flex items-center justify-between h-16 px-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold leading-none">HR</span>
+            </div>
+            <span className="text-lg font-semibold text-gray-900">Health Risk Predictor</span>
           </div>
-          {/* Nav actions */}
           <div className="flex items-center gap-3">
             <Link
               to="/signin"
-              className="hidden sm:flex items-center text-label-md text-on-surface-variant px-3 py-1.5 border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors"
+              className="text-base text-gray-600 hover:text-gray-900 px-4 py-2 transition-colors"
             >
-              Sign In
+              Sign in
             </Link>
-            <Link
-              to="/signup"
-              className="flex items-center text-label-md text-white bg-[#1d4ed8] px-4 py-1.5 rounded-lg shadow-sm hover:bg-primary transition-colors"
-            >
-              Sign Up
+            <Link to="/signup" className="btn-primary text-sm py-2 px-5">
+              Get started
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="flex-grow">
-        {/* ── Hero Section ────────────────────────────────────── */}
-        <section className="w-full px-4 md:px-8 max-w-[1280px] mx-auto py-14 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-          {/* Left: copy */}
-          <div className="flex flex-col gap-5">
-            <h1 className="text-display-lg text-on-surface leading-tight">
-              Early Awareness for Your Long-term Health
-            </h1>
-            <p className="text-body-base text-on-surface-variant max-w-md leading-relaxed">
-              A decision-support tool for diabetes and heart disease risk estimation. Input your data, get explained results, and take the first step toward prevention.
+      <main>
+        {/* Hero */}
+        <section className="max-w-5xl mx-auto px-6 py-16 md:py-24">
+          <div className="max-w-2xl">
+            <p className="text-xs font-medium text-blue-600 uppercase tracking-wide mb-4">
+              Clinical decision support tool
             </p>
-            {/* Disclaimer badge */}
-            <div className="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg border border-outline-variant w-fit">
-              <Icon name="info" className="text-outline text-[14px]" />
-              <p className="text-caption text-on-surface-variant">
-                This is a decision-support tool, not a medical diagnosis.
-              </p>
-            </div>
-            {/* CTA */}
-            <Link
-              to="/signup"
-              className="inline-flex items-center justify-center text-label-md font-medium text-white bg-[#1d4ed8] px-7 py-2.5 rounded-lg shadow-sm hover:bg-primary hover:shadow-md transition-all w-fit"
-            >
-              Get Started
-            </Link>
-          </div>
-
-          {/* Right: hero image */}
-          <div className="hidden md:block w-full rounded-xl overflow-hidden border border-outline-variant shadow-md relative aspect-[3/2] bg-surface-container">
-            <img
-              src="/assets/hero-medical.jpg"
-              alt="Advanced medical analytics visualization"
-              className="w-full h-full object-cover"
-            />
-            {/* Risk Estimate overlay card */}
-            <div className="absolute bottom-4 right-4 bg-surface-container-lowest/95 backdrop-blur-sm px-4 py-3 rounded-lg border border-outline-variant shadow-lg flex flex-col gap-2 w-44">
-              <div className="flex justify-between items-center">
-                <span className="text-caption text-on-surface-variant">Risk Estimate</span>
-                <span className="text-label-md text-error font-medium">Elevated</span>
-              </div>
-              <div className="w-full h-1.5 bg-surface-container rounded-full overflow-hidden">
-                <div className="h-full bg-error rounded-full" style={{ width: "72%" }} />
-              </div>
+            <h1 className="text-3xl md:text-4xl font-semibold text-gray-900 leading-tight mb-5">
+              Predict diabetes and heart disease risk from clinical measurements
+            </h1>
+            <p className="text-base text-gray-500 leading-relaxed mb-8 max-w-xl">
+              Enter patient vitals and lab values. The system runs validated machine learning models and returns a risk score with a feature-by-feature explanation of what drove the result.
+            </p>
+            <div className="flex items-center gap-3">
+              <Link to="/signup" className="btn-primary">
+                Start an assessment
+              </Link>
+              <Link to="/signin" className="btn-secondary">
+                Sign in
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* ── How It Works ─────────────────────────────────────── */}
-        <section className="bg-surface-container-lowest w-full border-t border-b border-outline-variant py-14">
-          <div className="px-4 md:px-8 max-w-[1280px] mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-headline-lg text-on-surface">How It Works</h2>
-              <p className="text-body-base text-on-surface-variant mt-2">
-                A streamlined process for clinical insights.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {HOW_IT_WORKS.map((step) => (
-                <div
-                  key={step.title}
-                  className="bg-surface p-6 rounded-xl border border-outline-variant shadow-card flex flex-col items-center text-center gap-3 hover:shadow-card-hover hover:-translate-y-0.5 transition-all duration-200"
-                >
-                  <div className="w-11 h-11 rounded-full bg-surface-container-low flex items-center justify-center text-primary mb-1">
-                    <Icon name={step.icon} className="text-[22px]" />
+        {/* How it works */}
+        <section className="border-t border-gray-200 bg-gray-50">
+          <div className="max-w-5xl mx-auto px-6 py-14">
+            <h2 className="text-base font-semibold text-gray-900 mb-8">How it works</h2>
+            <ol className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-8">
+              {[
+                {
+                  n: "1",
+                  title: "Enter patient measurements",
+                  desc: "Input clinical values such as glucose, BMI, blood pressure, cholesterol, and age.",
+                },
+                {
+                  n: "2",
+                  title: "Model computes risk probability",
+                  desc: "Validated Scikit-learn pipelines return a risk score and band (Low / Moderate / High).",
+                },
+                {
+                  n: "3",
+                  title: "Review factor explanations",
+                  desc: "SHAP values show exactly which measurements pushed risk up or down, and by how much.",
+                },
+                {
+                  n: "4",
+                  title: "Ask follow-up questions",
+                  desc: "A context-aware assistant can answer clinical questions about the prediction and factors.",
+                },
+              ].map((step) => (
+                <li key={step.n} className="flex gap-4">
+                  <span className="text-sm font-mono font-medium text-blue-600 mt-0.5 shrink-0 w-5">
+                    {step.n}.
+                  </span>
+                  <div>
+                    <h3 className="text-sm font-medium text-gray-900 mb-1">{step.title}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
                   </div>
-                  <h3 className="text-headline-sm text-on-surface">{step.title}</h3>
-                  <p className="text-body-base text-on-surface-variant">{step.desc}</p>
-                </div>
+                </li>
               ))}
-            </div>
+            </ol>
           </div>
         </section>
 
-        {/* ── Clinical Scope ───────────────────────────────────── */}
-        <section className="w-full px-4 md:px-8 max-w-[1280px] mx-auto py-14">
-          <div className="text-center mb-10">
-            <h2 className="text-headline-lg text-on-surface">Clinical Scope</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {/* Diabetes */}
-            <div className="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-card flex flex-col sm:flex-row hover:shadow-card-hover transition-shadow duration-200">
-              <div className="sm:w-1/3 bg-surface-container-low flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-outline-variant">
-                <Icon name="medical_services" className="text-primary text-[44px]" />
-              </div>
-              <div className="p-6 sm:w-2/3 flex flex-col justify-center gap-2">
-                <h3 className="text-headline-md text-on-surface">Diabetes Risk Screening</h3>
-                <p className="text-body-base text-on-surface-variant leading-relaxed">
-                  Evaluate metabolic indicators to estimate the likelihood of developing diabetes, supporting early intervention strategies.
-                </p>
-              </div>
+        {/* SHAP explanation preview */}
+        <section className="max-w-5xl mx-auto px-6 py-14">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900 mb-2">
+                Every result is explained
+              </h2>
+              <p className="text-sm text-gray-500 leading-relaxed mb-6">
+                The model doesn't return a number in isolation. SHAP (SHapley Additive exPlanations) values quantify the contribution of each clinical feature to the final risk score — so the result can be interrogated, not just accepted.
+              </p>
+              <ul className="space-y-3 text-sm">
+                {[
+                  "Risk expressed as a probability with a clearly labeled band",
+                  "Features ranked by magnitude of impact",
+                  "Direction shown: which values increased or decreased risk",
+                  "Works for both Diabetes and Heart Disease models",
+                ].map((point) => (
+                  <li key={point} className="flex items-start gap-2.5 text-gray-600">
+                    <span className="mt-0.5 w-4 h-4 rounded-full border border-green-600 flex items-center justify-center shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-green-600" />
+                    </span>
+                    {point}
+                  </li>
+                ))}
+              </ul>
             </div>
-            {/* Heart Disease */}
-            <div className="bg-surface border border-outline-variant rounded-xl overflow-hidden shadow-card flex flex-col sm:flex-row hover:shadow-card-hover transition-shadow duration-200">
-              <div className="sm:w-1/3 bg-surface-container-low flex items-center justify-center p-6 border-b sm:border-b-0 sm:border-r border-outline-variant">
-                <Icon name="monitor_heart" className="text-primary text-[44px]" />
-              </div>
-              <div className="p-6 sm:w-2/3 flex flex-col justify-center gap-2">
-                <h3 className="text-headline-md text-on-surface">Heart Disease Decision Support</h3>
-                <p className="text-body-base text-on-surface-variant leading-relaxed">
-                  Analyze cardiovascular risk factors to provide actionable insights for long-term heart health management.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* ── Explainable AI / SHAP Trust Section ─────────────── */}
-        <section className="bg-surface-container-lowest w-full border-t border-outline-variant py-14">
-          <div className="px-4 md:px-8 max-w-[1280px] mx-auto grid grid-cols-1 md:grid-cols-12 gap-10 items-center">
-            {/* SHAP image */}
-            <div className="md:col-span-5 flex justify-center">
-              <div className="w-full max-w-sm border border-outline-variant rounded-xl shadow-card overflow-hidden bg-surface">
-                <div className="px-4 pt-4 pb-2 border-b border-outline-variant">
-                  <h4 className="text-headline-sm text-on-surface">Feature Importance: SHAP Summary</h4>
-                  <p className="text-caption text-on-surface-variant mt-0.5">Impact on diabetes risk prediction</p>
-                </div>
-                {/* Inline bar chart using shapData */}
-                <div className="p-4 space-y-2">
-                  {shapData.map((item) => (
-                    <div key={item.feature} className="flex items-center gap-2">
-                      <span className="text-caption text-on-surface-variant w-32 text-right shrink-0 truncate">
+            {/* SHAP waterfall preview */}
+            <div className="card p-5">
+              <p className="text-xs font-medium text-gray-500 mb-4">
+                Example: Diabetes risk factor breakdown (SHAP)
+              </p>
+              <div className="space-y-2.5">
+                {shapData.map((item) => {
+                  const isPos = item.shapValue > 0;
+                  const pct = (Math.abs(item.shapValue) / maxAbs) * 100;
+                  return (
+                    <div key={item.feature} className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-36 shrink-0 text-right truncate">
                         {item.feature}
                       </span>
-                      <div className="flex-1 flex items-center gap-0.5">
-                        {/* Negative bar */}
+                      <div className="flex-1 flex items-center h-4 gap-px">
                         <div className="flex-1 flex justify-end">
-                          {item.shapValue < 0 && (
+                          {!isPos && (
                             <div
-                              className="h-3.5 rounded-l-full"
-                              style={{
-                                width: `${Math.abs(item.shapValue) * 260}%`,
-                                backgroundColor: "#00501f",
-                                opacity: 0.85,
-                              }}
+                              className="h-2.5 bg-green-500 rounded-l-sm"
+                              style={{ width: `${pct}%` }}
                             />
                           )}
                         </div>
-                        {/* Center axis */}
-                        <div className="w-px h-4 bg-outline-variant shrink-0" />
-                        {/* Positive bar */}
+                        <div className="w-px h-full bg-gray-300" />
                         <div className="flex-1">
-                          {item.shapValue > 0 && (
+                          {isPos && (
                             <div
-                              className="h-3.5 rounded-r-full"
-                              style={{
-                                width: `${item.shapValue * 260}%`,
-                                backgroundColor: "#ba1a1a",
-                                opacity: 0.85,
-                              }}
+                              className="h-2.5 bg-red-500 rounded-r-sm"
+                              style={{ width: `${pct}%` }}
                             />
                           )}
                         </div>
                       </div>
+                      <span
+                        className={`text-xs font-mono w-10 text-right shrink-0 ${
+                          isPos ? "text-red-600" : "text-green-600"
+                        }`}
+                      >
+                        {isPos ? "+" : ""}{item.shapValue.toFixed(2)}
+                      </span>
                     </div>
-                  ))}
-                </div>
-                {/* Legend */}
-                <div className="flex items-center justify-center gap-5 px-4 pb-4 pt-2 border-t border-outline-variant">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-[#00501f]" />
-                    <span className="text-caption text-on-surface-variant">Negative Impact</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-3 h-3 rounded-full bg-error" />
-                    <span className="text-caption text-on-surface-variant">Positive Impact</span>
-                  </div>
-                </div>
+                  );
+                })}
               </div>
-            </div>
-
-            {/* Right: copy */}
-            <div className="md:col-span-7 flex flex-col gap-4">
-              <h2 className="text-headline-lg text-on-surface">Explainable AI for Clinical Trust</h2>
-              <p className="text-body-base text-on-surface-variant leading-relaxed">
-                Our platform prioritizes transparency. Using SHAP (SHapley Additive exPlanations) values, every risk estimate is broken down to show exactly which health metrics contributed to the result—and by how much.
-              </p>
-              <p className="text-body-base text-on-surface-variant leading-relaxed">
-                Grounded in validated clinical datasets, our models are designed to complement, not replace, professional medical judgment.
-              </p>
-              <div className="mt-2">
-                <a href="#" className="text-label-md text-primary flex items-center gap-1 hover:underline w-fit">
-                  Learn about our methodology <Icon name="arrow_forward" className="text-[14px]" />
-                </a>
+              <div className="flex items-center gap-6 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-sm bg-green-500" />
+                  Decreases risk
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-sm bg-red-500" />
+                  Increases risk
+                </span>
               </div>
             </div>
           </div>
         </section>
       </main>
 
-      {/* ── Footer ──────────────────────────────────────────── */}
-      <footer className="bg-surface-container-lowest border-t border-outline-variant">
-        <div className="flex flex-col md:flex-row justify-between items-center w-full px-4 md:px-8 py-5 max-w-[1280px] mx-auto gap-4">
-          {/* Brand & Disclaimer */}
-          <div className="flex flex-col items-center md:items-start gap-0.5 text-center md:text-left">
-            <span className="text-label-md text-on-surface font-semibold">Health Risk Predictor</span>
-            <span className="text-caption text-on-surface-variant">
-              © 2026 Health Risk Predictor. For clinical decision support only.
-            </span>
-          </div>
-          {/* Links */}
-          <div className="flex flex-wrap justify-center gap-5">
-            <a href="#" className="text-caption text-on-surface-variant hover:text-primary transition-colors">
-              Documentation
-            </a>
-            <a href="#" className="text-caption text-on-surface-variant hover:text-primary transition-colors">
-              About HRP
-            </a>
-            <Link to="/privacy" className="text-caption text-on-surface-variant hover:text-primary transition-colors">
-              Privacy Policy
-            </Link>
-          </div>
-          {/* Auth links */}
-          <div className="flex gap-4">
-            <Link to="/signin" className="text-caption text-primary hover:underline">Sign In</Link>
-            <Link to="/signup" className="text-caption text-primary hover:underline">Sign Up</Link>
+      {/* Footer */}
+      <footer className="border-t border-gray-200 bg-gray-50 py-6">
+        <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+          <p>
+            <span className="font-medium text-gray-600">Health Risk Predictor</span>
+            {" "}— Clinical decision support only. Does not replace medical diagnosis.
+          </p>
+          <div className="flex items-center gap-4">
+            <Link to="/privacy" className="hover:text-gray-600 transition-colors">Privacy</Link>
+            <Link to="/terms" className="hover:text-gray-600 transition-colors">Terms</Link>
+            <Link to="/signin" className="text-blue-600 hover:text-blue-700 font-medium">Sign in</Link>
           </div>
         </div>
       </footer>

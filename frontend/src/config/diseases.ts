@@ -20,7 +20,7 @@ export const DISEASES: Record<string, DiseaseConfig> = {
       { name: "BMI", label: "BMI", type: "number", min: 0, max: 100, step: 0.1, default: 28.5, hint: "Body mass index", unit: "kg/m²", group: "Vitals" },
       { name: "BloodPressure", label: "Blood Pressure", type: "number", min: 0, max: 250, step: 1, default: 72, hint: "Diastolic blood pressure", unit: "mm Hg", group: "Vitals" },
       { name: "Glucose", label: "Glucose", type: "number", min: 0, max: 500, step: 1, default: 120, hint: "Plasma glucose concentration", unit: "mg/dL", group: "Lab Results" },
-      { name: "Insulin", label: "Insulin", type: "number", min: 0, max: 1500, step: 1, default: 80, hint: "2-hour serum insulin", unit: "mu U/ml", group: "Lab Results" },
+      { name: "Insulin", label: "Insulin", type: "number", min: 0, max: 1500, step: 1, default: 80, hint: "2-hour serum insulin", unit: "µU/mL", group: "Lab Results" },
       { name: "SkinThickness", label: "Skin Thickness", type: "number", min: 0, max: 150, step: 1, default: 20, hint: "Triceps skin fold thickness", unit: "mm", group: "Lab Results" },
       { name: "DiabetesPedigreeFunction", label: "Diabetes Pedigree Function", type: "number", min: 0, max: 5, step: 0.001, default: 0.5, hint: "Likelihood of diabetes from family history", group: "Lab Results" },
     ],
