@@ -23,3 +23,8 @@ httpx==0.28.1
 supabase
 PyJWT==2.9.0
 pytest==8.3.4
+
+# RAG / AI
+google-genai
+qdrant-client
+pymupdf

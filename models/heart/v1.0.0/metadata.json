@@ -24,9 +24,10 @@
     "ca",
     "thal"
   ],
-  "training_date": "2026-08-20 02:00:56",
-  "python_version": "3.13.13 (tags/v3.13.13:01104ce, Apr  7 2026, 19:25:48) [MSC v.1944 64 bit (AMD64)]",
-  "sklearn_version": "1.9.0",
+  "training_date": "2026-08-20 17:12:59",
+  "python_version": "3.12.14 (main, Aug 13 2026, 19:41:13) [GCC 14.2.0]",
+  "sklearn_version": "1.6.1",
+
   "random_state": 42,
   "cv_folds": 5,
   "test_size": 0.2,
@@ -885,12 +886,12 @@
       "roc_auc": 0.8937
     },
     "gradient_boosting": {
-      "threshold": 0.35,
-      "accuracy": 0.7603,
-      "precision": 0.6934,
+      "threshold": 0.34,
+      "accuracy": 0.7479,
+      "precision": 0.6786,
       "recall": 0.8559,
-      "f1": 0.7661,
-      "roc_auc": 0.859
+      "f1": 0.757,
+      "roc_auc": 0.8627
     }
   },
   "test_metrics": {
