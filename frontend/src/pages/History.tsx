@@ -236,10 +236,10 @@ function HistoryRow({
                 </div>
               </div>
 
-              {/* SHAP factors + Chat side by side on wider screens */}
-              <div className="flex flex-col lg:flex-row gap-6">
+              {/* SHAP factors then chat below */}
+              <div className="flex flex-col gap-6">
                 {/* SHAP factors */}
-                <div className="flex-1">
+                <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Contributing factors (SHAP)</p>
                   <div className="space-y-2">
                     {item.factors.map((f) => {
@@ -281,7 +281,7 @@ function HistoryRow({
                 </div>
 
                 {/* Inline chat */}
-                <div className="flex-1">
+                <div>
                   <InlineChat
                     context={`${item.disease} — ${item.band} risk, ${item.score} (${item.date})`}
                   />
