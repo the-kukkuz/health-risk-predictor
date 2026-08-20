@@ -6,10 +6,10 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-# Add src to the path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+# Add project root to path for runtime execution
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from evaluate import choose_threshold_for_model, compute_metrics
+from ml.heart.src.evaluate import choose_threshold_for_model, compute_metrics
 
 
 def test_choose_threshold_meets_recall():
