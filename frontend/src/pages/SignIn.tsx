@@ -72,13 +72,13 @@ export default function SignIn() {
       subtitle="Access your risk assessments and analytics."
     >
       {successMessage && (
-        <div className="rounded-lg border border-tertiary/20 bg-tertiary/10 p-3 text-sm text-tertiary">
+        <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
           {successMessage}
         </div>
       )}
 
       {loginError && (
-        <div className="rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {loginError}
         </div>
       )}
@@ -97,7 +97,7 @@ export default function SignIn() {
             aria-invalid={!!errors.email}
           />
           {errors.email && (
-            <p className="mt-1 text-xs text-error" role="alert">
+            <p className="field-error" role="alert">
               {errors.email}
             </p>
           )}
@@ -113,16 +113,16 @@ export default function SignIn() {
         />
 
         <div className="flex items-center justify-between">
-          <label className="flex items-center gap-2 text-sm text-on-surface-variant">
+          <label className="flex items-center gap-2 text-sm text-gray-600">
             <input
               type="checkbox"
-              className="w-4 h-4 rounded border-outline-variant"
+              className="w-4 h-4 rounded border-gray-300"
             />
             Remember me
           </label>
           <Link
             to="/forgot-password"
-            className="text-sm text-primary hover:underline"
+            className="text-sm text-blue-600 hover:text-blue-700"
           >
             Forgot password?
           </Link>
@@ -131,18 +131,18 @@ export default function SignIn() {
         <button className="btn-primary w-full" type="submit" disabled={loading}>
           {loading ? (
             <>
-              <span className="inline-block w-4 h-4 border-2 border-on-surface-variant/30 border-t-primary rounded-full animate-spin mr-2" />
-              Signing in...
+              <span className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Signing in…
             </>
           ) : (
-            "Sign In"
+            "Sign in"
           )}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-body-base text-on-surface-variant">
+      <p className="mt-6 text-center text-sm text-gray-500">
         Don't have an account?{" "}
-        <Link to="/signup" className="text-primary font-medium hover:underline">
+        <Link to="/signup" className="text-blue-600 font-medium hover:text-blue-700">
           Sign up
         </Link>
       </p>
