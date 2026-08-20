@@ -92,7 +92,6 @@ export default function History() {
 
   const filtered = MOCK.filter((item) => {
     const matchesQuery =
-      item.id.toLowerCase().includes(query.toLowerCase()) ||
       item.disease.toLowerCase().includes(query.toLowerCase());
     const matchesBand = !bandFilter || item.band === bandFilter;
     return matchesQuery && matchesBand;
@@ -101,10 +100,10 @@ export default function History() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Page header */}
-      <div className="page-header">
-        <h1 className="page-title">History</h1>
-        <p className="page-subtitle">
-          Record of all executed risk assessments. Select a row to review factors.
+      <div className="mb-2">
+        <h1 className="text-xl font-bold tracking-tight text-gray-900">History</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Your past risk assessments. Select a row to review factors.
         </p>
       </div>
 
@@ -117,7 +116,7 @@ export default function History() {
           />
           <input
             className="input-field pl-9"
-            placeholder="Search ID or disease…"
+            placeholder="Search by disease…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -135,17 +134,16 @@ export default function History() {
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
+          <table className="w-full text-sm text-left min-w-[600px]">
             <thead>
-              <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Date</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Model</th>
-                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500">Score</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500">Band</th>
-                <th className="px-4 py-3" />
+              <tr className="border-b border-gray-200/80 bg-gray-50/60">
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Model</th>
+                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Score</th>
+                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk Level</th>
+                <th className="px-5 py-3" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -159,7 +157,7 @@ export default function History() {
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-gray-400 text-sm">
+                  <td colSpan={5} className="px-5 py-10 text-center text-gray-400 text-sm">
                     No records match your filter.
                   </td>
                 </tr>
@@ -167,8 +165,8 @@ export default function History() {
             </tbody>
           </table>
         </div>
-        <div className="px-4 py-2.5 border-t border-gray-100 text-xs text-gray-400 bg-gray-50">
-          {filtered.length} of {MOCK.length} records
+        <div className="px-5 py-3 border-t border-gray-100 text-xs font-medium text-gray-500 bg-gray-50/50">
+          Showing {filtered.length} of {MOCK.length} records
         </div>
       </div>
     </div>
@@ -195,10 +193,9 @@ function HistoryRow({
         }`}
         onClick={onToggle}
       >
-        <td className="px-4 py-3 text-gray-400 text-xs whitespace-nowrap">{item.date}</td>
-        <td className="px-4 py-3 font-mono text-xs text-blue-600">{item.id}</td>
-        <td className="px-4 py-3 text-gray-900">{item.disease}</td>
-        <td className="px-4 py-3 text-right font-mono text-gray-800">{item.score}</td>
+        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">{item.date}</td>
+        <td className="px-4 py-3 text-gray-900 text-sm">{item.disease}</td>
+        <td className="px-4 py-3 text-right font-mono text-sm text-gray-800">{item.score}</td>
         <td className="px-4 py-3">
           <span className={chip}>{item.band}</span>
         </td>
@@ -213,13 +210,13 @@ function HistoryRow({
       {/* Expanded detail row */}
       {expanded && (
         <tr>
-          <td colSpan={6} className="p-0 bg-gray-50 border-b border-gray-200">
+          <td colSpan={5} className="p-0 bg-gray-50 border-b border-gray-200">
             <div className="px-6 py-5 space-y-6 max-w-2xl">
               {/* Result summary */}
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <p className="text-xs text-gray-400 mb-1">{item.disease} · {item.date}</p>
+                    <p className="text-sm text-gray-500 mb-1">{item.disease} · {item.date}</p>
                     <div className="flex items-center gap-2">
                       <span className={chip}>{item.band} risk</span>
                     </div>
@@ -238,14 +235,14 @@ function HistoryRow({
 
               {/* SHAP factors */}
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-3">Contributing factors (SHAP)</p>
+                <p className="text-sm font-medium text-gray-500 mb-3">Contributing factors (SHAP)</p>
                 <div className="space-y-2">
                   {item.factors.map((f) => {
                     const isPos = f.impact > 0;
                     const pct = Math.abs(f.impact) * 200;
                     return (
                       <div key={f.name} className="flex items-center gap-3">
-                        <span className="text-xs text-gray-500 w-28 shrink-0 text-right">
+                        <span className="text-sm text-gray-500 w-28 shrink-0 text-right">
                           {f.name}
                         </span>
                         <div className="flex-1 flex items-center h-3 gap-px">
@@ -267,7 +264,7 @@ function HistoryRow({
                             )}
                           </div>
                         </div>
-                        <span className={`text-xs font-mono w-10 text-right shrink-0 ${
+                        <span className={`text-sm font-mono w-10 text-right shrink-0 ${
                           isPos ? "text-red-600" : "text-green-600"
                         }`}>
                           {isPos ? "+" : ""}{f.impact.toFixed(2)}

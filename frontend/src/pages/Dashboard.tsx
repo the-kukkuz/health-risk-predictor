@@ -34,9 +34,9 @@ export default function Dashboard() {
   return (
     <div className="space-y-8 animate-fade-in">
       {/* Page header */}
-      <div className="page-header">
-        <h1 className="page-title">Analytics</h1>
-        <p className="page-subtitle">
+      <div className="mb-2">
+        <h1 className="text-xl font-bold tracking-tight text-gray-900">Analytics</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Platform usage metrics and model performance benchmarks.
         </p>
       </div>
@@ -103,34 +103,34 @@ function PlatformAnalytics({
       )}
 
       {/* Summary stats — single row panel */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-gray-200 rounded-lg overflow-hidden border border-gray-200">
-        <StatCell label="Total assessments" value={totalPredictions ?? "1,248"} />
-        <StatCell label="Active models" value={`${readyModules || 2} / 2`} />
-        <StatCell label="High risk rate" value="18.2%" highlight />
-        <StatCell label="Avg. inference" value="42 ms" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <StatCard label="Total Assessments" value={totalPredictions ?? "1,248"} />
+        <StatCard label="Active Models" value={`${readyModules || 2} / 2`} />
+        <StatCard label="High Risk Rate" value="18.2%" highlight />
+        <StatCard label="Avg. Inference" value="42 ms" />
       </div>
 
       {/* Analytics Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Risk distribution */}
         <section className="flex flex-col h-full">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">
-            Risk tier distribution
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+            Risk Tier Distribution
           </h2>
-          <div className="card p-6 space-y-5 flex-1 flex flex-col justify-center">
-            <RiskBar label="Low (0–33%)" count={682} pct={54.6} color="#16a34a" />
-            <RiskBar label="Moderate (34–66%)" count={342} pct={27.4} color="#d97706" />
-            <RiskBar label="High (67–100%)" count={224} pct={18.0} color="#dc2626" />
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm space-y-5 flex-1 flex flex-col justify-center">
+            <RiskBar label="Low (0–33%)" count={682} pct={54.6} color="#10b981" />
+            <RiskBar label="Moderate (34–66%)" count={342} pct={27.4} color="#f59e0b" />
+            <RiskBar label="High (67–100%)" count={224} pct={18.0} color="#f43f5e" />
           </div>
         </section>
 
         {/* Age cohort bars */}
         <section className="flex flex-col h-full">
-          <h2 className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-4">
-            Assessments by age cohort
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+            Assessments by Age Cohort
           </h2>
-          <div className="card p-6 flex-1 flex flex-col justify-end min-h-[220px]">
-            <div className="flex items-end gap-3 h-40">
+          <div className="bg-white p-6 rounded-lg border border-gray-200 shadow-sm flex-1 flex flex-col justify-between min-h-[220px]">
+            <div className="flex items-end gap-3 h-36 pt-6">
               {[
                 { label: "18–30", h: 35 },
                 { label: "31–40", h: 55 },
@@ -138,15 +138,13 @@ function PlatformAnalytics({
                 { label: "51–60", h: 70 },
                 { label: "60+", h: 95 },
               ].map((b) => (
-                <div key={b.label} className="flex-1 flex flex-col items-center gap-2 h-full justify-end">
-                  <span className="text-[10px] font-mono text-gray-400">
-                    {b.h}%
-                  </span>
+                <div key={b.label} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+                  <span className="text-[10px] font-semibold text-gray-500">{b.h}%</span>
                   <div
-                    className="w-full bg-blue-600 rounded-t-sm"
-                    style={{ height: `${b.h}%` }}
+                    className="w-full bg-blue-600 rounded-t-sm transition-all duration-300"
+                    style={{ height: `${Math.round(b.h * 0.72)}%` }}
                   />
-                  <span className="text-[11px] text-gray-500">{b.label}</span>
+                  <span className="text-[11px] font-medium text-gray-500 shrink-0">{b.label}</span>
                 </div>
               ))}
             </div>
@@ -157,11 +155,11 @@ function PlatformAnalytics({
   );
 }
 
-function StatCell({ label, value, highlight = false }: { label: string; value: string | number; highlight?: boolean }) {
+function StatCard({ label, value, highlight = false }: { label: string; value: string | number; highlight?: boolean }) {
   return (
-    <div className="bg-white px-4 py-4">
-      <p className="text-xs text-gray-500 mb-1">{label}</p>
-      <p className={`text-xl font-semibold ${highlight ? "text-red-600" : "text-gray-900"}`}>
+    <div className="bg-white px-4 py-4 rounded-lg border border-gray-200 shadow-sm">
+      <p className="text-xs font-medium text-gray-500 mb-1">{label}</p>
+      <p className={`text-2xl font-bold tracking-tight ${highlight ? "text-amber-600" : "text-gray-900"}`}>
         {value}
       </p>
     </div>

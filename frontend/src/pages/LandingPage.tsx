@@ -18,21 +18,21 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white text-gray-900">
       {/* Header */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto flex items-center justify-between h-14 px-6">
-          <div className="flex items-center gap-2.5">
-            <div className="w-6 h-6 rounded bg-blue-600 flex items-center justify-center">
-              <span className="text-white text-[11px] font-bold leading-none">HR</span>
+        <div className="max-w-5xl mx-auto flex items-center justify-between h-16 px-6">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-blue-600 flex items-center justify-center">
+              <span className="text-white text-sm font-bold leading-none">HR</span>
             </div>
-            <span className="text-sm font-semibold text-gray-900">Health Risk Predictor</span>
+            <span className="text-lg font-semibold text-gray-900">Health Risk Predictor</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Link
               to="/signin"
-              className="text-sm text-gray-600 hover:text-gray-900 px-3 py-1.5 transition-colors"
+              className="text-base text-gray-600 hover:text-gray-900 px-4 py-2 transition-colors"
             >
               Sign in
             </Link>
-            <Link to="/signup" className="btn-primary text-xs py-1.5 px-3">
+            <Link to="/signup" className="btn-primary text-sm py-2 px-5">
               Get started
             </Link>
           </div>

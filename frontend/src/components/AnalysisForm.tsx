@@ -145,7 +145,13 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
                       <input
                         id={f.name}
                         type="number"
-                        className={`input-field ${f.unit ? "pr-12" : ""} ${
+                        className={`input-field no-spinner ${
+                          f.unit
+                            ? f.unit.length > 4
+                              ? "pr-16"
+                              : "pr-12"
+                            : ""
+                        } ${
                           errors[f.name] ? "border-red-400 focus:border-red-500 focus:ring-red-500/20" : ""
                         }`}
                         min={f.min}
@@ -157,7 +163,7 @@ export default function AnalysisForm({ configs, loading, onSubmit }: Props) {
                         disabled={disabled}
                       />
                       {f.unit && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none">
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400 pointer-events-none select-none whitespace-nowrap">
                           {f.unit}
                         </span>
                       )}

@@ -161,7 +161,7 @@ h1, h2, h3, h4, h5, h6 {
     @apply mb-8;
   }
   .page-title {
-    @apply text-xl font-semibold text-gray-900;
+    @apply text-xl font-bold tracking-tight text-gray-900;
   }
   .page-subtitle {
     @apply mt-1 text-sm text-gray-500;
@@ -186,5 +186,14 @@ h1, h2, h3, h4, h5, h6 {
     background: linear-gradient(90deg, #e5e7eb 25%, #f3f4f6 50%, #e5e7eb 75%);
     background-size: 200% 100%;
     animation: shimmer 1.5s infinite;
+  }
+  /* Hide native number input spinners — unit labels sit in that space */
+  .no-spinner::-webkit-outer-spin-button,
+  .no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  .no-spinner[type=number] {
+    -moz-appearance: textfield;
   }
 }

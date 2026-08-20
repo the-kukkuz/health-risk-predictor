@@ -96,9 +96,9 @@ export default function Analysis() {
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Page header */}
-      <div className="page-header mb-0">
-        <h1 className="page-title">Risk Assessment</h1>
-        <p className="page-subtitle">
+      <div className="mb-2">
+        <h1 className="text-xl font-bold tracking-tight text-gray-900">Risk Assessment</h1>
+        <p className="text-sm text-gray-500 mt-1">
           Enter clinical measurements to compute disease risk probability.
         </p>
       </div>
@@ -163,7 +163,7 @@ export default function Analysis() {
             if (!result) return null;
             return (
               <section key={key}>
-                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+                <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-4">
                   {DISEASES[key].title} result
                 </h2>
                 <RiskResult
@@ -198,26 +198,26 @@ function StepBar({ step }: { step: 1 | 2 | 3 }) {
           <div key={label} className="flex items-center">
             <div className="flex items-center gap-2">
               <span
-                className={`w-5 h-5 rounded-full text-[11px] font-medium flex items-center justify-center shrink-0 ${
+                className={`w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center shrink-0 ${
                   done
                     ? "bg-blue-600 text-white"
                     : active
                     ? "bg-blue-600 text-white"
-                    : "bg-gray-200 text-gray-500"
+                    : "bg-gray-100 text-gray-400 border border-gray-200"
                 }`}
               >
-                {done ? <Icon name="check" className="text-[12px]" /> : n}
+                {done ? <Icon name="check" className="text-[13px]" /> : n}
               </span>
               <span
-                className={`text-xs hidden sm:inline ${
-                  active ? "text-gray-900 font-medium" : done ? "text-gray-500" : "text-gray-400"
+                className={`text-sm hidden sm:inline font-medium ${
+                  active ? "text-gray-900" : done ? "text-gray-500" : "text-gray-400"
                 }`}
               >
                 {label}
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`w-8 md:w-14 h-px mx-2 ${done ? "bg-blue-600" : "bg-gray-200"}`} />
+              <div className={`w-10 md:w-16 h-px mx-3 ${done ? "bg-blue-500" : "bg-gray-200"}`} />
             )}
           </div>
         );
@@ -236,44 +236,40 @@ function ConditionSelect({ onContinue }: { onContinue: (keys: string[]) => void 
   }
 
   return (
-    <div className="space-y-6">
-      <p className="text-sm text-gray-600">
+    <div className="space-y-5">
+      <p className="text-sm text-gray-500">
         Select one or both conditions to assess simultaneously.
       </p>
-      <div className="card divide-y divide-gray-200">
+      <div className="bg-white rounded-lg border border-gray-200 shadow-sm divide-y divide-gray-100 overflow-hidden">
         {Object.values(DISEASES).map((cfg: DiseaseConfig) => {
           const active = selected.includes(cfg.key);
-          const accentColor = cfg.key === "heart" ? "border-red-500" : "border-blue-500";
           return (
             <button
               key={cfg.key}
               onClick={() => toggle(cfg.key)}
-              className={`w-full flex items-start gap-4 px-5 py-4 text-left transition-colors hover:bg-gray-50 ${
-                active ? "bg-blue-50 hover:bg-blue-50" : ""
+              className={`w-full flex items-center gap-4 px-5 py-4 text-left transition-colors ${
+                active ? "bg-blue-50 hover:bg-blue-50/80" : "hover:bg-gray-50"
               }`}
             >
               {/* Checkbox */}
               <div
-                className={`mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
                   active
                     ? "bg-blue-600 border-blue-600"
-                    : "border-gray-300"
+                    : "border-gray-300 bg-white"
                 }`}
               >
-                {active && <Icon name="check" className="text-white text-[11px]" />}
+                {active && <Icon name="check" className="text-white text-[12px]" />}
               </div>
+              {/* Accent bar */}
+              <div
+                className="w-1 self-stretch rounded-full shrink-0"
+                style={{ backgroundColor: active ? (cfg.key === "heart" ? "#ef4444" : "#2563eb") : "#e5e7eb" }}
+              />
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span
-                    className={`w-1 h-4 rounded-full shrink-0 ${
-                      active ? accentColor : "border border-gray-300"
-                    } ${active ? "" : "border"}`}
-                    style={active ? { backgroundColor: cfg.key === "heart" ? "#ef4444" : "#2563eb" } : {}}
-                  />
-                  <span className="text-sm font-medium text-gray-900">{cfg.title}</span>
-                </div>
-                <p className="text-xs text-gray-500 leading-relaxed">{cfg.subtitle}</p>
+                <p className="text-sm font-semibold text-gray-900">{cfg.title}</p>
+                <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{cfg.subtitle}</p>
               </div>
             </button>
           );
