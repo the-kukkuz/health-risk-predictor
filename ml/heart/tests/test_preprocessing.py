@@ -7,10 +7,10 @@ import numpy as np
 import pandas as pd
 import pytest
 
-# Add src to the path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+# Add project root to path for runtime execution
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from preprocessing import (
+from ml.heart.src.preprocessing import (
     NUMERICAL_COLS,
     CATEGORICAL_COLS,
     TARGET_NAME,

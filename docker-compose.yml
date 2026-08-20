@@ -31,12 +31,9 @@ services:
       # the Dockerfile and the image is self-contained (models/data are baked in).
       ENVIRONMENT: ${ENVIRONMENT:-development}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
-    # No host volume mounts for models/data/ml: the production image is
-    # self-contained. For local development without a rebuild, you can
-    # temporarily restore these mounts:
-    #   - ./models:/models:ro
-    #   - ./data:/data:ro
-    #   - ./ml:/ml:ro
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     healthcheck:

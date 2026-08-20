@@ -66,3 +66,12 @@ PARAM_GRIDS = {
         'classifier__subsample': [0.8, 1.0]
     }
 }
+
+# --------------------------------------------------------------------------
+# Explainability Configuration
+# --------------------------------------------------------------------------
+# Number of training rows to keep as a background summary for SHAP.
+SHAP_BACKGROUND_SIZE = 100
+
+# How many top contributing factors to return per explanation.
+TOP_FACTORS = 5

@@ -22,6 +22,8 @@ from app.api.routes import (
     predict as predict_route,
     predictions as predictions_route,
     statistics as statistics_route,
+    auth as auth_route,
+    users as users_route,
 )
 from app.core.config import get_settings
 from app.db.session import Base, engine
@@ -93,12 +95,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
 # Routers
 app.include_router(health_route.router)
 app.include_router(models_route.router)
 app.include_router(predict_route.router)
 app.include_router(statistics_route.router)
 app.include_router(predictions_route.router)
+app.include_router(auth_route.router)
+app.include_router(users_route.router)
 
 
 @app.get("/", tags=["root"])

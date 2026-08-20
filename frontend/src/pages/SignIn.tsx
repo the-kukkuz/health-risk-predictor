@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import Icon from "../components/Icon";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import PasswordInput from "../components/PasswordInput";
 import { useAuth } from "../contexts/AuthContext";
 
-// Sign In page. Calls useAuth().login() on valid credentials.
-// Mock credentials: admin / admin (replace with Supabase once integrated).
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,7 +11,10 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  const successMessage = (location.state as { message?: string } | null)?.message;
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
@@ -28,13 +28,41 @@ export default function SignIn() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setLoading(true);
-    // Demo mode: always authenticate
-    const success = login(email, password);
-    setLoading(false);
+    setLoginError("");
 
-    if (success) {
-      navigate("/");
+    if (!validate()) return;
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Invalid login credentials");
+      }
+
+      if (data.access_token) {
+        localStorage.setItem("access_token", data.access_token);
+      }
+
+      await login(email, password);
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setLoginError(err.message);
+      } else {
+        setLoginError("An unexpected error occurred during sign in.");
+      }
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -43,6 +71,12 @@ export default function SignIn() {
       title="Sign in"
       subtitle="Access your risk assessments and analytics."
     >
+      {successMessage && (
+        <div className="rounded-lg border border-tertiary/20 bg-tertiary/10 p-3 text-sm text-tertiary">
+          {successMessage}
+        </div>
+      )}
+
       {loginError && (
         <div className="rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error">
           {loginError}
@@ -97,7 +131,7 @@ export default function SignIn() {
         <button className="btn-primary w-full" type="submit" disabled={loading}>
           {loading ? (
             <>
-              <span className="inline-block w-4 h-4 border-2 border-on-surface-variant/30 border-t-primary rounded-full animate-spin" />
+              <span className="inline-block w-4 h-4 border-2 border-on-surface-variant/30 border-t-primary rounded-full animate-spin mr-2" />
               Signing in...
             </>
           ) : (

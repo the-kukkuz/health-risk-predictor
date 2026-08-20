@@ -1,12 +1,25 @@
+# backend/requirements.txt
+
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
-pydantic==2.10.4
+
+pydantic[email]==2.10.4
 pydantic-settings==2.7.1
+python-dotenv>=1.0.0
+
 SQLAlchemy==2.0.36
 psycopg2-binary==2.9.10
+
 pandas==2.2.3
 numpy==2.2.2
 scikit-learn==1.6.1
 shap==0.46.0
 joblib==1.4.2
+
 python-multipart==0.0.20
+email-validator>=2.2.0
+httpx==0.28.1
+
+supabase
+PyJWT==2.9.0
+pytest==8.3.4
