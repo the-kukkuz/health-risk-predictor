@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import PasswordInput from "../components/PasswordInput";
 import { useAuth } from "../contexts/AuthContext";
@@ -11,7 +11,10 @@ export default function SignIn() {
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
+
+  const successMessage = (location.state as { message?: string } | null)?.message;
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
@@ -32,7 +35,7 @@ export default function SignIn() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/login", {
+      const response = await fetch("/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,6 +71,12 @@ export default function SignIn() {
       title="Sign in"
       subtitle="Access your risk assessments and analytics."
     >
+      {successMessage && (
+        <div className="rounded-lg border border-tertiary/20 bg-tertiary/10 p-3 text-sm text-tertiary">
+          {successMessage}
+        </div>
+      )}
+
       {loginError && (
         <div className="rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error">
           {loginError}

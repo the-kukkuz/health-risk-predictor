@@ -3,7 +3,6 @@ from fastapi import APIRouter, HTTPException, Depends, status
 from pydantic import BaseModel, EmailStr
 from supabase import create_client, Client
 from dotenv import load_dotenv
-from app.core.auth import get_current_user
 
 load_dotenv()
 

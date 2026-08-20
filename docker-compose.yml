@@ -30,6 +30,9 @@ services:
       DATA_DIR: /data/diabetes
       ENVIRONMENT: ${ENVIRONMENT:-development}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
+      SUPABASE_URL: ${SUPABASE_URL}
+      SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
+      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
     volumes:
       # Mount the trained model + data so retraining doesn't require rebuild.
       - ./models:/models:ro
