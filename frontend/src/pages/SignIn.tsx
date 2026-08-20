@@ -54,7 +54,7 @@ export default function SignIn() {
       }
 
       await login(email, password);
-      navigate("/dashboard");
+      navigate("/");
     } catch (err: unknown) {
       if (err instanceof Error) {
         setLoginError(err.message);
