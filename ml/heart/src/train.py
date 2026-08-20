@@ -47,6 +47,7 @@ from config import (
     RECALL_FLOOR,
     RISK_BANDS,
     PARAM_GRIDS,
+    SHAP_BACKGROUND_SIZE,
 )
 from evaluate import (
     choose_threshold_for_model,
@@ -240,21 +241,34 @@ def evaluate_on_test(
 
 def build_artifact(
     final_pipeline: Any,
+    bundle: DatasetBundle,
     family: str,
     threshold: float,
     best_params: dict
 ) -> Dict[str, Any]:
-    """Assemble final production model artifact for inference layer serving (SHAP removed)."""
+    """Assemble final production model artifact for inference layer serving."""
+    preprocessor = final_pipeline.named_steps["preprocessor"]
     classifier = final_pipeline.named_steps["classifier"]
+    
+    # Small transformed background sample for (re)building SHAP explainers.
+    rng = np.random.default_rng(RANDOM_STATE)
+    n_bg = min(SHAP_BACKGROUND_SIZE, len(bundle.X_train))
+    bg_idx = rng.choice(len(bundle.X_train), size=n_bg, replace=False)
+    X_background_transformed = preprocessor.transform(
+        bundle.X_train.iloc[bg_idx]
+    ).astype(float)
     
     return {
         "pipeline": final_pipeline,
+        "preprocessor": preprocessor,
+        "classifier": classifier,
         "classifier_class": classifier.__class__.__name__,
         "family": family,
         "feature_names": NUMERICAL_COLS + CATEGORICAL_COLS,
         "threshold": float(threshold),
         "best_params": _clean_params(best_params),
         "risk_bands": RISK_BANDS,
+        "X_background": X_background_transformed,
         "model_name": MODEL_NAME,
         "model_version": MODEL_VERSION
     }
@@ -387,7 +401,7 @@ def main() -> None:
     logger.info(f"  Confusion Matrix: {test_metrics['confusion_matrix']}")
     
     # 7. Package and save versioned artifact
-    artifact = build_artifact(final_pipeline, winning_family, winning_threshold, best_params)
+    artifact = build_artifact(final_pipeline, bundle, winning_family, winning_threshold, best_params)
     metadata = build_metadata(artifact, selection, test_metrics, bundle)
     
     joblib.dump(artifact, artifact_path)
