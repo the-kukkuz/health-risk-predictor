@@ -3,13 +3,15 @@ import Icon from "../components/Icon";
 import InlineChat from "../components/InlineChat";
 import { getPredictions } from "../services/api";
 
-interface HistoryItem {
-  id: string;
-  disease: string;
-  band: "High" | "Moderate" | "Low";
-  score: string;
-  date: string;
-  factors: { name: string; impact: number }[];
+// ─── API shape ────────────────────────────────────────────────────────────────
+
+interface PredictionRecord {
+  id: number;
+  disease_type: string;
+  model_version: string;
+  probability: number;
+  risk_band: "High" | "Moderate" | "Low";
+  created_at: string | null;
 }
 
 const BAND_COLOR: Record<string, { chip: string; bar: string }> = {
@@ -18,50 +20,56 @@ const BAND_COLOR: Record<string, { chip: string; bar: string }> = {
   Low:      { chip: "chip risk-low",  bar: "#16a34a" },
 };
 
+function formatDate(iso: string | null) {
+  if (!iso) return "—";
+  return new Date(iso).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatDisease(disease_type: string) {
+  if (disease_type === "diabetes") return "Diabetes";
+  if (disease_type === "heart")    return "Heart Disease";
+  return disease_type.charAt(0).toUpperCase() + disease_type.slice(1);
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 export default function History() {
-  const [query, setQuery] = useState("");
-  const [bandFilter, setBandFilter] = useState("");
-  const [expanded, setExpanded] = useState<string | null>(null);
-  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [records, setRecords] = useState<PredictionRecord[]>([]);
+  const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [diseaseFilter, setDiseaseFilter] = useState("");
+  const [bandFilter, setBandFilter] = useState("");
+  const [expanded, setExpanded] = useState<number | null>(null);
 
   useEffect(() => {
-    getPredictions()
-      .then((data) => {
-        const items = data.items.map((r: any): HistoryItem => {
-          const diseaseLabel = r.disease_type === "diabetes" ? "Diabetes" : "Heart Disease";
-          const formattedDate = r.created_at
-            ? new Date(r.created_at).toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              })
-            : "Unknown";
+    let cancelled = false;
 
-          return {
-            id: `PID-${r.id}`,
-            disease: diseaseLabel,
-            band: r.risk_band as any,
-            score: `${(r.probability * 100).toFixed(1)}%`,
-            date: formattedDate,
-            factors: [], // No factors stored in basic DB records
-          };
-        });
-        setHistoryItems(items);
-      })
-      .catch((err) => {
-        console.error("Failed to load history from backend:", err);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    async function load() {
+      try {
+        const data = await getPredictions();
+        if (!cancelled) {
+          setRecords(data.items ?? []);
+          setTotal(data.total ?? 0);
+        }
+      } catch (err) {
+        console.error("Failed to load history:", err);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+    return () => { cancelled = true; };
   }, []);
 
-  const filtered = historyItems.filter((item) => {
-    const matchesQuery =
-      item.disease.toLowerCase().includes(query.toLowerCase());
-    const matchesBand = !bandFilter || item.band === bandFilter;
-    return matchesQuery && matchesBand;
+  const filtered = records.filter((r) => {
+    const matchesDisease = !diseaseFilter || r.disease_type === diseaseFilter;
+    const matchesBand = !bandFilter || r.risk_band === bandFilter;
+    return matchesDisease && matchesBand;
   });
 
   return (
@@ -70,28 +78,25 @@ export default function History() {
       <div className="mb-2">
         <h1 className="text-xl font-bold tracking-tight text-gray-900">History</h1>
         <p className="text-sm text-gray-500 mt-1">
-          Your past risk assessments. Select a row to review factors.
+          Your past risk assessments. Select a row to review details.
         </p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Icon
-            name="search"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px] pointer-events-none"
-          />
-          <input
-            className="input-field pl-9"
-            placeholder="Search by disease…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+        <select
+          className="select-field max-w-[200px]"
+          value={diseaseFilter}
+          onChange={(e) => { setDiseaseFilter(e.target.value); setExpanded(null); }}
+        >
+          <option value="">All diseases</option>
+          <option value="diabetes">Diabetes</option>
+          <option value="heart">Heart Disease</option>
+        </select>
         <select
           className="select-field max-w-[180px]"
           value={bandFilter}
-          onChange={(e) => setBandFilter(e.target.value)}
+          onChange={(e) => { setBandFilter(e.target.value); setExpanded(null); }}
         >
           <option value="">All risk bands</option>
           <option value="High">High</option>
@@ -114,43 +119,64 @@ export default function History() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map((item) => (
-                <HistoryRow
-                  key={item.id}
-                  item={item}
-                  expanded={expanded === item.id}
-                  onToggle={() => setExpanded(expanded === item.id ? null : item.id)}
-                />
-              ))}
-              {filtered.length === 0 && (
+              {loading ? (
+                [1, 2, 3, 4, 5].map((i) => (
+                  <tr key={i}>
+                    <td className="px-5 py-3.5"><div className="skeleton h-4 w-28" /></td>
+                    <td className="px-5 py-3.5"><div className="skeleton h-4 w-24" /></td>
+                    <td className="px-5 py-3.5 text-right"><div className="skeleton h-4 w-12 ml-auto" /></td>
+                    <td className="px-5 py-3.5"><div className="skeleton h-4 w-16" /></td>
+                    <td className="px-5 py-3.5" />
+                  </tr>
+                ))
+              ) : filtered.length > 0 ? (
+                filtered.map((record) => (
+                  <HistoryRow
+                    key={record.id}
+                    record={record}
+                    expanded={expanded === record.id}
+                    onToggle={() => setExpanded(expanded === record.id ? null : record.id)}
+                  />
+                ))
+              ) : (
                 <tr>
                   <td colSpan={5} className="px-5 py-10 text-center text-gray-400 text-sm">
-                    No records match your filter.
+                    {records.length === 0
+                      ? "No assessments yet — run your first assessment to see it here."
+                      : "No records match your filter."}
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
+        {/* Footer */}
         <div className="px-5 py-3 border-t border-gray-100 text-xs font-medium text-gray-500 bg-gray-50/50">
-          Showing {filtered.length} of {historyItems.length} records
+          {loading
+            ? "Loading records…"
+            : `Showing ${filtered.length} of ${total} records`}
         </div>
       </div>
     </div>
   );
 }
 
+// ─── HistoryRow ───────────────────────────────────────────────────────────────
+
 function HistoryRow({
-  item,
+  record,
   expanded,
   onToggle,
 }: {
-  item: HistoryItem;
+  record: PredictionRecord;
   expanded: boolean;
   onToggle: () => void;
 }) {
-  const { chip, bar } = BAND_COLOR[item.band] ?? BAND_COLOR.Moderate;
-  const scoreNum = parseFloat(item.score);
+  const { chip, bar } = BAND_COLOR[record.risk_band] ?? BAND_COLOR.Moderate;
+  const scorePct = Math.round(record.probability * 100);
+  const diseaseLabel = formatDisease(record.disease_type);
+  const dateLabel    = formatDate(record.created_at);
 
   return (
     <>
@@ -160,11 +186,11 @@ function HistoryRow({
         }`}
         onClick={onToggle}
       >
-        <td className="px-4 py-3 w-36 text-gray-600 text-sm font-medium whitespace-nowrap">{item.date}</td>
-        <td className="px-4 py-3 text-gray-900 text-sm font-medium">{item.disease}</td>
-        <td className="px-4 py-3 w-28 text-right font-mono text-sm text-gray-800">{item.score}</td>
+        <td className="px-4 py-3 w-36 text-gray-600 text-sm font-medium whitespace-nowrap">{dateLabel}</td>
+        <td className="px-4 py-3 text-gray-900 text-sm font-medium">{diseaseLabel}</td>
+        <td className="px-4 py-3 w-28 text-right font-mono text-sm text-gray-800">{scorePct}%</td>
         <td className="px-4 py-3 w-32">
-          <span className={chip}>{item.band}</span>
+          <span className={chip}>{record.risk_band}</span>
         </td>
         <td className="px-4 py-3 w-10 text-right">
           <Icon
@@ -179,81 +205,32 @@ function HistoryRow({
         <tr>
           <td colSpan={5} className="p-0 bg-blue-50/40 border-b border-blue-100">
             <div className="px-6 py-5">
-              {/* Result summary row */}
+              {/* Result summary */}
               <div className="flex items-center gap-6 mb-5">
-                {/* Left: disease + date + band */}
                 <div className="flex-1">
-                  <p className="text-xs text-gray-500 mb-1">{item.disease} · {item.date}</p>
+                  <p className="text-xs text-gray-500 mb-1">{diseaseLabel} · {dateLabel}</p>
                   <div className="flex items-center gap-2">
-                    <span className={chip}>{item.band} risk</span>
+                    <span className={chip}>{record.risk_band} risk</span>
                   </div>
                 </div>
-                {/* Center: score + bar */}
                 <div className="flex-[2]">
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-xs text-gray-500">Risk score</span>
-                    <span className="text-sm font-semibold font-mono text-gray-900">{item.score}</span>
+                    <span className="text-sm font-semibold font-mono text-gray-900">{scorePct}%</span>
                   </div>
                   <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full rounded-full transition-all duration-500"
-                      style={{ width: `${scoreNum}%`, backgroundColor: bar }}
+                      style={{ width: `${scorePct}%`, backgroundColor: bar }}
                     />
                   </div>
                 </div>
               </div>
 
-              {/* SHAP factors then chat below */}
-              <div className="flex flex-col gap-6">
-                {/* SHAP factors */}
-                <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Contributing factors (SHAP)</p>
-                  <div className="space-y-2">
-                    {item.factors.map((f) => {
-                      const isPos = f.impact > 0;
-                      const pct = Math.abs(f.impact) * 200;
-                      return (
-                        <div key={f.name} className="flex items-center gap-3">
-                          <span className="text-sm text-gray-500 w-32 shrink-0 text-right">
-                            {f.name}
-                          </span>
-                          <div className="flex-1 flex items-center h-3 gap-px">
-                            <div className="flex-1 flex justify-end">
-                              {!isPos && (
-                                <div
-                                  className="h-2 bg-green-500 rounded-l-sm"
-                                  style={{ width: `${pct}%` }}
-                                />
-                              )}
-                            </div>
-                            <div className="w-px h-full bg-gray-300 shrink-0" />
-                            <div className="flex-1">
-                              {isPos && (
-                                <div
-                                  className="h-2 bg-red-500 rounded-r-sm"
-                                  style={{ width: `${pct}%` }}
-                                />
-                              )}
-                            </div>
-                          </div>
-                          <span className={`text-xs font-mono w-10 text-right shrink-0 ${
-                            isPos ? "text-red-600" : "text-green-600"
-                          }`}>
-                            {isPos ? "+" : ""}{f.impact.toFixed(2)}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* Inline chat */}
-                <div>
-                  <InlineChat
-                    context={`${item.disease} — ${item.band} risk, ${item.score} (${item.date})`}
-                  />
-                </div>
-              </div>
+              {/* Inline chat */}
+              <InlineChat
+                context={`${diseaseLabel} — ${record.risk_band} risk, ${scorePct}% (${dateLabel})`}
+              />
             </div>
           </td>
         </tr>
