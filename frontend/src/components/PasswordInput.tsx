@@ -33,14 +33,14 @@ export default function PasswordInput({ id, label, value, onChange, error, hint 
         <button
           type="button"
           onClick={() => setVisible(!visible)}
-          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-on-surface-variant hover:text-on-surface transition"
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
           aria-label={visible ? "Hide password" : "Show password"}
         >
           <Icon name={visible ? "visibility_off" : "visibility"} className="text-[18px]" />
         </button>
       </div>
       {error ? (
-        <p id={`${id}-error`} className="mt-1 text-xs text-error" role="alert">
+        <p id={`${id}-error`} className="field-error" role="alert">
           {error}
         </p>
       ) : hint ? (

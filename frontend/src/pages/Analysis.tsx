@@ -45,10 +45,6 @@ const DEMO_RESULTS: Record<string, PredictionResponse> = {
   },
 };
 
-// Consolidated single-page Analysis flow with three internal states:
-//   A. condition selection
-//   B. data entry (one unified form)
-//   C. results (risk band + SHAP per disease + inline chat)
 export default function Analysis() {
   const [state, setState] = useState<State>({ kind: "select" });
   const [loading, setLoading] = useState(false);
@@ -75,7 +71,6 @@ export default function Analysis() {
         });
 
         if (!response.ok) {
-          // Backend unreachable or returned an error — use demo data
           console.warn(`Backend returned ${response.status} for ${key} — using demo data`);
           return { key, result: DEMO_RESULTS[key] ?? null, demo: true } as const;
         }
@@ -83,7 +78,6 @@ export default function Analysis() {
         const result: PredictionResponse = await response.json();
         return { key, result, demo: false } as const;
       } catch {
-        // Network error (backend not running) — silently fall back to demo
         console.warn(`Backend unreachable for ${key} — using demo data`);
         return { key, result: DEMO_RESULTS[key] ?? null, demo: true } as const;
       }
@@ -91,34 +85,26 @@ export default function Analysis() {
 
     const outcomes = await Promise.all(promises);
     const results: Record<string, PredictionResponse> = {};
-    let anyDemo = false;
-
     for (const outcome of outcomes) {
-      if (outcome.result) {
-        results[outcome.key] = outcome.result;
-        if (outcome.demo) anyDemo = true;
-      }
+      if (outcome.result) results[outcome.key] = outcome.result;
     }
 
     setLoading(false);
-    setState({
-      kind: "results",
-      selected: state.selected,
-      results,
-      errors: anyDemo
-        ? {} // demo mode — no errors, just show the disclaimer in the result card
-        : {},
-    });
+    setState({ kind: "results", selected: state.selected, results, errors: {} });
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-display-lg text-on-surface">Analysis</h1>
-        <p className="text-body-base text-on-surface-variant mt-1">
-          Assess diabetes and/or heart disease risk from clinical inputs.
+    <div className="space-y-6 animate-fade-in">
+      {/* Page header */}
+      <div className="page-header mb-0">
+        <h1 className="page-title">Risk Assessment</h1>
+        <p className="page-subtitle">
+          Enter clinical measurements to compute disease risk probability.
         </p>
       </div>
+
+      {/* Step indicator */}
+      <StepBar step={state.kind === "select" ? 1 : state.kind === "entry" ? 2 : 3} />
 
       {state.kind === "select" && (
         <ConditionSelect onContinue={startEntry} />
@@ -129,19 +115,17 @@ export default function Analysis() {
           <div className="flex items-center justify-between">
             <div className="flex flex-wrap gap-2">
               {state.selected.map((key) => (
-                <span
-                  key={key}
-                  className="chip bg-surface-container-high text-primary border-outline-variant"
-                >
+                <span key={key} className="chip bg-blue-50 text-blue-700 border-blue-200">
                   {DISEASES[key].title}
                 </span>
               ))}
             </div>
             <button
-              className="text-label-md text-primary hover:underline flex items-center gap-1"
+              className="btn-ghost text-xs"
               onClick={() => setState({ kind: "select" })}
             >
-              <Icon name="arrow_back" className="text-[16px]" /> Change conditions
+              <Icon name="arrow_back" className="text-[15px]" />
+              Change
             </button>
           </div>
 
@@ -154,35 +138,33 @@ export default function Analysis() {
       )}
 
       {state.kind === "results" && (
-        <div className="space-y-6">
-          {/* Top bar: condition chips + edit button */}
+        <div className="space-y-8">
+          {/* Header row */}
           <div className="flex items-center justify-between">
             <div className="flex flex-wrap gap-2">
               {state.selected.map((key) => (
-                <span
-                  key={key}
-                  className="chip bg-surface-container-high text-primary border-outline-variant"
-                >
+                <span key={key} className="chip bg-blue-50 text-blue-700 border-blue-200">
                   {DISEASES[key].title}
                 </span>
               ))}
             </div>
             <button
-              className="text-label-md text-primary hover:underline flex items-center gap-1"
+              className="btn-ghost text-xs"
               onClick={() => setState({ kind: "entry", selected: state.selected })}
             >
-              <Icon name="edit" className="text-[16px]" /> Edit inputs
+              <Icon name="edit" className="text-[15px]" />
+              Edit inputs
             </button>
           </div>
 
-          {/* Result cards */}
+          {/* Results */}
           {state.selected.map((key) => {
             const result = state.results[key];
             if (!result) return null;
             return (
-              <div key={key} className="card p-6">
-                <h2 className="text-headline-md text-on-surface mb-4">
-                  {DISEASES[key].title}
+              <section key={key}>
+                <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">
+                  {DISEASES[key].title} result
                 </h2>
                 <RiskResult
                   result={result}
@@ -190,16 +172,56 @@ export default function Analysis() {
                   negativeLabel={DISEASES[key].resultLabels.negative}
                   simple={key === "heart"}
                 />
-              </div>
+              </section>
             );
           })}
 
-          {/* Inline chat — always visible below results */}
+          {/* Inline chat */}
           <InlineChat
             context={state.selected.map((k) => DISEASES[k].title).join(" & ")}
           />
         </div>
       )}
+    </div>
+  );
+}
+
+function StepBar({ step }: { step: 1 | 2 | 3 }) {
+  const steps = ["Select condition", "Enter measurements", "View results"];
+  return (
+    <div className="flex items-center gap-0">
+      {steps.map((label, i) => {
+        const n = i + 1;
+        const done = step > n;
+        const active = step === n;
+        return (
+          <div key={label} className="flex items-center">
+            <div className="flex items-center gap-2">
+              <span
+                className={`w-5 h-5 rounded-full text-[11px] font-medium flex items-center justify-center shrink-0 ${
+                  done
+                    ? "bg-blue-600 text-white"
+                    : active
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-200 text-gray-500"
+                }`}
+              >
+                {done ? <Icon name="check" className="text-[12px]" /> : n}
+              </span>
+              <span
+                className={`text-xs hidden sm:inline ${
+                  active ? "text-gray-900 font-medium" : done ? "text-gray-500" : "text-gray-400"
+                }`}
+              >
+                {label}
+              </span>
+            </div>
+            {i < steps.length - 1 && (
+              <div className={`w-8 md:w-14 h-px mx-2 ${done ? "bg-blue-600" : "bg-gray-200"}`} />
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -215,36 +237,44 @@ function ConditionSelect({ onContinue }: { onContinue: (keys: string[]) => void 
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <p className="text-sm text-gray-600">
+        Select one or both conditions to assess simultaneously.
+      </p>
+      <div className="card divide-y divide-gray-200">
         {Object.values(DISEASES).map((cfg: DiseaseConfig) => {
           const active = selected.includes(cfg.key);
+          const accentColor = cfg.key === "heart" ? "border-red-500" : "border-blue-500";
           return (
             <button
               key={cfg.key}
               onClick={() => toggle(cfg.key)}
-              className={`card p-6 text-left transition border-2 ${
-                active
-                  ? "border-primary bg-surface-container-low"
-                  : "border-outline-variant hover:border-primary/40"
+              className={`w-full flex items-start gap-4 px-5 py-4 text-left transition-colors hover:bg-gray-50 ${
+                active ? "bg-blue-50 hover:bg-blue-50" : ""
               }`}
             >
-              <div className="flex items-center justify-between mb-3">
-                <Icon
-                  name={cfg.key === "heart" ? "monitor_heart" : "medical_services"}
-                  className="text-[28px] text-primary"
-                />
-                <span
-                  className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                    active ? "bg-primary border-primary text-on-primary" : "border-outline"
-                  }`}
-                >
-                  {active && <Icon name="check" className="text-[14px]" />}
-                </span>
+              {/* Checkbox */}
+              <div
+                className={`mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
+                  active
+                    ? "bg-blue-600 border-blue-600"
+                    : "border-gray-300"
+                }`}
+              >
+                {active && <Icon name="check" className="text-white text-[11px]" />}
               </div>
-              <h3 className="text-headline-md text-on-surface">{cfg.title}</h3>
-              <p className="text-body-base text-on-surface-variant mt-1">
-                {cfg.subtitle}
-              </p>
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span
+                    className={`w-1 h-4 rounded-full shrink-0 ${
+                      active ? accentColor : "border border-gray-300"
+                    } ${active ? "" : "border"}`}
+                    style={active ? { backgroundColor: cfg.key === "heart" ? "#ef4444" : "#2563eb" } : {}}
+                  />
+                  <span className="text-sm font-medium text-gray-900">{cfg.title}</span>
+                </div>
+                <p className="text-xs text-gray-500 leading-relaxed">{cfg.subtitle}</p>
+              </div>
             </button>
           );
         })}
@@ -257,7 +287,7 @@ function ConditionSelect({ onContinue }: { onContinue: (keys: string[]) => void 
           onClick={() => onContinue(selected)}
         >
           Continue
-          <Icon name="arrow_forward" className="text-[18px]" />
+          <Icon name="arrow_forward" className="text-[16px]" />
         </button>
       </div>
     </div>

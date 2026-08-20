@@ -82,7 +82,7 @@ export default function SignUp() {
       subtitle="Start assessing diabetes and heart disease risk with personalized insights."
     >
       {signupError && (
-        <div className="rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error mb-4">
+        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700 mb-4">
           {signupError}
         </div>
       )}
@@ -101,7 +101,7 @@ export default function SignUp() {
             aria-invalid={!!errors.name}
           />
           {errors.name && (
-            <p className="mt-1 text-xs text-error" role="alert">
+            <p className="field-error" role="alert">
               {errors.name}
             </p>
           )}
@@ -120,7 +120,7 @@ export default function SignUp() {
             aria-invalid={!!errors.email}
           />
           {errors.email && (
-            <p className="mt-1 text-xs text-error" role="alert">
+            <p className="field-error" role="alert">
               {errors.email}
             </p>
           )}
@@ -147,23 +147,23 @@ export default function SignUp() {
           <input
             type="checkbox"
             id="terms"
-            className="w-4 h-4 mt-0.5 rounded border-outline-variant"
+            className="w-4 h-4 mt-0.5 rounded border-gray-300"
             checked={termsAccepted}
             onChange={(e) => setTermsAccepted(e.target.checked)}
           />
-          <label htmlFor="terms" className="text-sm text-on-surface-variant">
+          <label htmlFor="terms" className="text-sm text-gray-600">
             I agree to the{" "}
-            <Link to="/terms" className="text-primary hover:underline">
+            <Link to="/terms" className="text-blue-600 hover:text-blue-700">
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link to="/privacy" className="text-primary hover:underline">
+            <Link to="/privacy" className="text-blue-600 hover:text-blue-700">
               Privacy Policy
             </Link>
           </label>
         </div>
         {errors.terms && (
-          <p className="text-xs text-error" role="alert">
+          <p className="field-error" role="alert">
             {errors.terms}
           </p>
         )}
@@ -171,18 +171,18 @@ export default function SignUp() {
         <button className="btn-primary w-full" type="submit" disabled={loading}>
           {loading ? (
             <>
-              <span className="inline-block w-4 h-4 border-2 border-on-surface-variant/30 border-t-primary rounded-full animate-spin mr-2" />
-              Creating account...
+              <span className="inline-block w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Creating account…
             </>
           ) : (
-            "Create Account"
+            "Create account"
           )}
         </button>
       </form>
 
-      <p className="mt-6 text-center text-body-base text-on-surface-variant">
+      <p className="mt-6 text-center text-sm text-gray-500">
         Already have an account?{" "}
-        <Link to="/signin" className="text-primary font-medium hover:underline">
+        <Link to="/signin" className="text-blue-600 font-medium hover:text-blue-700">
           Sign in
         </Link>
       </p>

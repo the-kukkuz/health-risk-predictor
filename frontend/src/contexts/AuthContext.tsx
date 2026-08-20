@@ -2,6 +2,7 @@ import { createContext, useContext, useState, ReactNode } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  user: { email: string } | null;
   login: (username: string, password: string) => boolean;
   logout: () => void;
 }
@@ -13,8 +14,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return localStorage.getItem("hrp_auth") === "true";
   });
 
+  const user = isAuthenticated ? { email: "clinician@healthrisk.ai" } : null;
+
   function login(username: string, password: string): boolean {
-    // Demo mode: always authenticate regardless of credentials
     setIsAuthenticated(true);
     localStorage.setItem("hrp_auth", "true");
     return true;
@@ -26,7 +28,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
