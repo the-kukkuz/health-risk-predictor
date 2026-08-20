@@ -1,4 +1,4 @@
-import { Link, NavLink, Route, Routes, useLocation } from "react-router-dom";
+import { Link, NavLink, Route, Routes, useLocation, useNavigate, Navigate, Outlet } from "react-router-dom";
 import Icon from "./components/Icon";
 import LandingPage from "./pages/LandingPage";
 import Home from "./pages/Home";
@@ -61,6 +61,14 @@ function Sidebar() {
 }
 
 function TopBar() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSignOut = () => {
+    logout();
+    navigate("/");
+  };
+
   return (
     <header className="bg-surface border-b border-outline-variant shadow-sm shrink-0">
       <div className="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-max-width mx-auto">
@@ -77,8 +85,12 @@ function TopBar() {
           <button className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition">
             <Icon name="settings" className="text-[20px]" />
           </button>
-          <button className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-primary transition">
-            <Icon name="account_circle" className="text-[20px]" />
+          <button 
+            onClick={handleSignOut}
+            title="Sign Out"
+            className="p-2 rounded-full text-on-surface-variant hover:bg-surface-container-low hover:text-error transition"
+          >
+            <Icon name="logout" className="text-[20px]" />
           </button>
         </div>
       </div>
@@ -106,12 +118,7 @@ function AppShell() {
         <TopBar />
         <main className="flex-1 overflow-y-auto bg-background">
           <div className="max-w-max-width mx-auto px-margin-mobile md:px-margin-desktop py-8">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/analysis" element={<Analysis />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/history" element={<History />} />
-            </Routes>
+            <Outlet />
           </div>
         </main>
         <Footer />
@@ -120,39 +127,14 @@ function AppShell() {
   );
 }
 
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
+function ProtectedLayout() {
   const { isAuthenticated } = useAuth();
-  const location = useLocation();
-
+  
   if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-4">
-        <div className="text-center space-y-4 max-w-md">
-          <Icon name="lock" className="text-[48px] text-on-surface-variant" />
-          <div>
-            <h2 className="text-headline-lg text-on-surface">Authentication Required</h2>
-            <p className="text-body-base text-on-surface-variant mt-2">
-              Please sign in to access this page.
-            </p>
-          </div>
-          <Link
-            to="/signin"
-            className="btn-primary inline-flex"
-          >
-            <Icon name="login" className="text-[18px]" />
-            Sign In
-          </Link>
-        </div>
-      </div>
-    );
+    return <LandingPage />;
   }
-
-  return <>{children}</>;
-}
-
-function LandingOrApp() {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <AppShell /> : <LandingPage />;
+  
+  return <AppShell />;
 }
 
 export default function App() {
@@ -166,14 +148,16 @@ export default function App() {
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
 
-        {/* Root route: LandingPage when not authenticated, AppShell when authenticated */}
-        <Route path="/" element={<LandingOrApp />}>
-          {/* Authenticated routes — wrapped in AppShell (sidebar + topbar + footer) */}
+        {/* Protected routes — show landing page if not authenticated */}
+        <Route element={<ProtectedLayout />}>
           <Route path="/" element={<Home />} />
           <Route path="/analysis" element={<Analysis />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/history" element={<History />} />
         </Route>
+        
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AuthProvider>
   );
