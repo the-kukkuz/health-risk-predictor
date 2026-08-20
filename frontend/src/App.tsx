@@ -56,13 +56,6 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
-      <div className="p-4 border-t border-outline-variant/50">
-        <button className="w-full flex items-center justify-center gap-2 p-2.5 bg-surface-container-highest text-primary text-label-md rounded-lg hover:bg-surface-variant transition">
-          <Icon name="trending_up" className="text-[16px]" />
-          Upgrade Analytics
-        </button>
-      </div>
     </aside>
   );
 }
