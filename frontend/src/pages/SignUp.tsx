@@ -1,11 +1,8 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import Icon from "../components/Icon";
+import { Link, useNavigate } from "react-router-dom";
 import AuthLayout from "../components/AuthLayout";
 import PasswordInput from "../components/PasswordInput";
 
-// Sign Up page. Design-first stub: form layout only, no auth wiring yet.
-// Rendered outside the sidebar shell.
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -14,6 +11,8 @@ export default function SignUp() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
+  const [signupError, setSignupError] = useState("");
+  const navigate = useNavigate();
 
   function validate(): boolean {
     const errs: Record<string, string> = {};
@@ -30,10 +29,51 @@ export default function SignUp() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setSignupError("");
+
     if (!validate()) return;
+
     setLoading(true);
-    // Stub: no auth wiring yet. Replace with real registration logic.
-    setTimeout(() => setLoading(false), 1000);
+
+    // Split Full Name into first_name and last_name for FastAPI SignUpSchema
+    const nameParts = name.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "";
+
+    try {
+      const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          first_name: firstName,
+          last_name: lastName,
+          role: "user",
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to create account.");
+      }
+
+      // Redirect user to Sign In page after registration
+      navigate("/signin", {
+        state: { message: "Account created successfully! Please sign in." },
+      });
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setSignupError(err.message);
+      } else {
+        setSignupError("An unexpected error occurred during sign up.");
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -41,6 +81,12 @@ export default function SignUp() {
       title="Create your account"
       subtitle="Start assessing diabetes and heart disease risk with personalized insights."
     >
+      {signupError && (
+        <div className="rounded-lg border border-error/20 bg-error/10 p-3 text-sm text-error mb-4">
+          {signupError}
+        </div>
+      )}
+
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div>
           <label className="label-field" htmlFor="name">Full Name</label>
@@ -125,7 +171,7 @@ export default function SignUp() {
         <button className="btn-primary w-full" type="submit" disabled={loading}>
           {loading ? (
             <>
-              <span className="inline-block w-4 h-4 border-2 border-on-surface-variant/30 border-t-primary rounded-full animate-spin" />
+              <span className="inline-block w-4 h-4 border-2 border-on-surface-variant/30 border-t-primary rounded-full animate-spin mr-2" />
               Creating account...
             </>
           ) : (
