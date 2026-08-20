@@ -128,6 +128,22 @@ resource "azurerm_container_app" "backend" {
     value = var.supabase_jwt_secret
   }
 
+  secret {
+    name  = "gemini-api-key"
+    value = var.gemini_api_key
+  }
+
+  secret {
+    name  = "qdrant-url"
+    value = var.qdrant_url
+  }
+
+  secret {
+    name  = "qdrant-api-key"
+    value = var.qdrant_api_key
+  }
+
+
   registry {
     server               = azurerm_container_registry.main.login_server
     username             = azurerm_container_registry.main.admin_username
@@ -151,7 +167,7 @@ resource "azurerm_container_app" "backend" {
 
     container {
       name   = "health-risk-backend"
-      image  = "${azurerm_container_registry.main.login_server}/health-risk-backend:1.1.0"
+      image  = "${azurerm_container_registry.main.login_server}/${var.container_image}"
       cpu    = 0.5
       memory = "1Gi"
 
@@ -193,6 +209,26 @@ resource "azurerm_container_app" "backend" {
       env {
         name        = "SUPABASE_JWT_SECRET"
         secret_name = "supabase-jwt-secret"
+      }
+
+      env {
+        name        = "GEMINI_API_KEY"
+        secret_name = "gemini-api-key"
+      }
+
+      env {
+        name        = "QDRANT_URL"
+        secret_name = "qdrant-url"
+      }
+
+      env {
+        name        = "QDRANT_API_KEY"
+        secret_name = "qdrant-api-key"
+      }
+
+      env {
+        name  = "CORS_ORIGINS"
+        value = var.cors_origins
       }
 
     }
