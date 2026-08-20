@@ -139,11 +139,11 @@ export default function History() {
           <table className="w-full text-sm text-left min-w-[600px]">
             <thead>
               <tr className="border-b border-gray-200/80 bg-gray-50/60">
-                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
+                <th className="px-5 py-3 w-36 text-xs font-semibold text-gray-500 uppercase tracking-wider">Date</th>
                 <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Model</th>
-                <th className="px-5 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Score</th>
-                <th className="px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk Level</th>
-                <th className="px-5 py-3" />
+                <th className="px-5 py-3 w-28 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Score</th>
+                <th className="px-5 py-3 w-32 text-xs font-semibold text-gray-500 uppercase tracking-wider">Risk Level</th>
+                <th className="px-5 py-3 w-10" />
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -193,13 +193,13 @@ function HistoryRow({
         }`}
         onClick={onToggle}
       >
-        <td className="px-4 py-3 text-gray-500 text-sm whitespace-nowrap">{item.date}</td>
-        <td className="px-4 py-3 text-gray-900 text-sm">{item.disease}</td>
-        <td className="px-4 py-3 text-right font-mono text-sm text-gray-800">{item.score}</td>
-        <td className="px-4 py-3">
+        <td className="px-4 py-3 w-36 text-gray-600 text-sm font-medium whitespace-nowrap">{item.date}</td>
+        <td className="px-4 py-3 text-gray-900 text-sm font-medium">{item.disease}</td>
+        <td className="px-4 py-3 w-28 text-right font-mono text-sm text-gray-800">{item.score}</td>
+        <td className="px-4 py-3 w-32">
           <span className={chip}>{item.band}</span>
         </td>
-        <td className="px-4 py-3 text-right">
+        <td className="px-4 py-3 w-10 text-right">
           <Icon
             name={expanded ? "keyboard_arrow_up" : "keyboard_arrow_down"}
             className="text-[18px] text-gray-400"
@@ -210,75 +210,83 @@ function HistoryRow({
       {/* Expanded detail row */}
       {expanded && (
         <tr>
-          <td colSpan={5} className="p-0 bg-gray-50 border-b border-gray-200">
-            <div className="px-6 py-5 space-y-6 max-w-2xl">
-              {/* Result summary */}
-              <div>
-                <div className="flex items-center justify-between mb-3">
-                  <div>
-                    <p className="text-sm text-gray-500 mb-1">{item.disease} · {item.date}</p>
-                    <div className="flex items-center gap-2">
-                      <span className={chip}>{item.band} risk</span>
-                    </div>
+          <td colSpan={5} className="p-0 bg-blue-50/40 border-b border-blue-100">
+            <div className="px-6 py-5">
+              {/* Result summary row */}
+              <div className="flex items-center gap-6 mb-5">
+                {/* Left: disease + date + band */}
+                <div className="flex-1">
+                  <p className="text-xs text-gray-500 mb-1">{item.disease} · {item.date}</p>
+                  <div className="flex items-center gap-2">
+                    <span className={chip}>{item.band} risk</span>
                   </div>
-                  <span className="text-2xl font-semibold font-mono text-gray-900">
-                    {item.score}
-                  </span>
                 </div>
-                <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full"
-                    style={{ width: `${scoreNum}%`, backgroundColor: bar }}
+                {/* Center: score + bar */}
+                <div className="flex-[2]">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-xs text-gray-500">Risk score</span>
+                    <span className="text-sm font-semibold font-mono text-gray-900">{item.score}</span>
+                  </div>
+                  <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-500"
+                      style={{ width: `${scoreNum}%`, backgroundColor: bar }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SHAP factors + Chat side by side on wider screens */}
+              <div className="flex flex-col lg:flex-row gap-6">
+                {/* SHAP factors */}
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Contributing factors (SHAP)</p>
+                  <div className="space-y-2">
+                    {item.factors.map((f) => {
+                      const isPos = f.impact > 0;
+                      const pct = Math.abs(f.impact) * 200;
+                      return (
+                        <div key={f.name} className="flex items-center gap-3">
+                          <span className="text-sm text-gray-500 w-32 shrink-0 text-right">
+                            {f.name}
+                          </span>
+                          <div className="flex-1 flex items-center h-3 gap-px">
+                            <div className="flex-1 flex justify-end">
+                              {!isPos && (
+                                <div
+                                  className="h-2 bg-green-500 rounded-l-sm"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              )}
+                            </div>
+                            <div className="w-px h-full bg-gray-300 shrink-0" />
+                            <div className="flex-1">
+                              {isPos && (
+                                <div
+                                  className="h-2 bg-red-500 rounded-r-sm"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              )}
+                            </div>
+                          </div>
+                          <span className={`text-xs font-mono w-10 text-right shrink-0 ${
+                            isPos ? "text-red-600" : "text-green-600"
+                          }`}>
+                            {isPos ? "+" : ""}{f.impact.toFixed(2)}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Inline chat */}
+                <div className="flex-1">
+                  <InlineChat
+                    context={`${item.disease} — ${item.band} risk, ${item.score} (${item.date})`}
                   />
                 </div>
               </div>
-
-              {/* SHAP factors */}
-              <div>
-                <p className="text-sm font-medium text-gray-500 mb-3">Contributing factors (SHAP)</p>
-                <div className="space-y-2">
-                  {item.factors.map((f) => {
-                    const isPos = f.impact > 0;
-                    const pct = Math.abs(f.impact) * 200;
-                    return (
-                      <div key={f.name} className="flex items-center gap-3">
-                        <span className="text-sm text-gray-500 w-28 shrink-0 text-right">
-                          {f.name}
-                        </span>
-                        <div className="flex-1 flex items-center h-3 gap-px">
-                          <div className="flex-1 flex justify-end">
-                            {!isPos && (
-                              <div
-                                className="h-2 bg-green-500 rounded-l-sm"
-                                style={{ width: `${pct}%` }}
-                              />
-                            )}
-                          </div>
-                          <div className="w-px h-full bg-gray-300 shrink-0" />
-                          <div className="flex-1">
-                            {isPos && (
-                              <div
-                                className="h-2 bg-red-500 rounded-r-sm"
-                                style={{ width: `${pct}%` }}
-                              />
-                            )}
-                          </div>
-                        </div>
-                        <span className={`text-sm font-mono w-10 text-right shrink-0 ${
-                          isPos ? "text-red-600" : "text-green-600"
-                        }`}>
-                          {isPos ? "+" : ""}{f.impact.toFixed(2)}
-                        </span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Inline chat */}
-              <InlineChat
-                context={`${item.disease} — ${item.band} risk, ${item.score} (${item.date})`}
-              />
             </div>
           </td>
         </tr>
