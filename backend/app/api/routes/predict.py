@@ -13,6 +13,7 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_user
 from app.db.session import get_db
 from app.models.prediction import PredictionRecord
 from app.schemas.prediction import (
@@ -41,6 +42,7 @@ def predict(
     disease: str,
     payload: dict,
     db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
 ) -> PredictionResponse:
     # 1. Resolve service (404 for unknown diseases).
     try:
@@ -83,6 +85,7 @@ def predict(
             probability=result.probability,
             risk_band=result.risk_band,
             threshold=result.threshold,
+            user_id=current_user.id,
         )
         db.add(record)
         db.commit()

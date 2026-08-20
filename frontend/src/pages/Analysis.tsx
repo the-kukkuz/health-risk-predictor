@@ -64,9 +64,13 @@ export default function Analysis() {
     const promises = state.selected.map(async (key) => {
       const cfg = DISEASES[key];
       try {
+        const token = localStorage.getItem("access_token");
         const response = await fetch(`/api/v1/predict/${cfg.apiDisease}`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
           body: JSON.stringify(valuesByDisease[key]),
         });
 

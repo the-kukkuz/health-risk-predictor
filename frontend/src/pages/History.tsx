@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Icon from "../components/Icon";
 import InlineChat from "../components/InlineChat";
+import { getPredictions } from "../services/api";
 
 interface HistoryItem {
   id: string;
@@ -10,74 +11,6 @@ interface HistoryItem {
   date: string;
   factors: { name: string; impact: number }[];
 }
-
-const MOCK: HistoryItem[] = [
-  {
-    id: "PID-8842-A",
-    disease: "Diabetes",
-    band: "High",
-    score: "87.4%",
-    date: "Aug 20, 2026",
-    factors: [
-      { name: "Glucose", impact: 0.38 },
-      { name: "BMI", impact: 0.26 },
-      { name: "Age", impact: 0.18 },
-      { name: "Insulin", impact: -0.09 },
-    ],
-  },
-  {
-    id: "PID-1092-C",
-    disease: "Diabetes",
-    band: "Moderate",
-    score: "45.2%",
-    date: "Aug 19, 2026",
-    factors: [
-      { name: "Glucose", impact: 0.22 },
-      { name: "BMI", impact: 0.14 },
-      { name: "BloodPressure", impact: -0.06 },
-      { name: "Age", impact: 0.12 },
-    ],
-  },
-  {
-    id: "PID-7731-M",
-    disease: "Diabetes",
-    band: "Low",
-    score: "12.8%",
-    date: "Aug 18, 2026",
-    factors: [
-      { name: "Glucose", impact: -0.12 },
-      { name: "Insulin", impact: -0.08 },
-      { name: "BMI", impact: -0.06 },
-      { name: "Age", impact: 0.04 },
-    ],
-  },
-  {
-    id: "PID-4029-B",
-    disease: "Heart Disease",
-    band: "Moderate",
-    score: "58.1%",
-    date: "Aug 17, 2026",
-    factors: [
-      { name: "Cholesterol", impact: 0.28 },
-      { name: "RestingBP", impact: 0.16 },
-      { name: "MaxHR", impact: -0.10 },
-      { name: "Age", impact: 0.20 },
-    ],
-  },
-  {
-    id: "PID-9921-X",
-    disease: "Diabetes",
-    band: "High",
-    score: "91.0%",
-    date: "Aug 16, 2026",
-    factors: [
-      { name: "Glucose", impact: 0.42 },
-      { name: "BMI", impact: 0.30 },
-      { name: "DiabetesPedigree", impact: 0.18 },
-      { name: "Insulin", impact: -0.07 },
-    ],
-  },
-];
 
 const BAND_COLOR: Record<string, { chip: string; bar: string }> = {
   High:     { chip: "chip risk-high", bar: "#dc2626" },
@@ -89,8 +22,42 @@ export default function History() {
   const [query, setQuery] = useState("");
   const [bandFilter, setBandFilter] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = MOCK.filter((item) => {
+  useEffect(() => {
+    getPredictions()
+      .then((data) => {
+        const items = data.items.map((r: any): HistoryItem => {
+          const diseaseLabel = r.disease_type === "diabetes" ? "Diabetes" : "Heart Disease";
+          const formattedDate = r.created_at
+            ? new Date(r.created_at).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
+            : "Unknown";
+
+          return {
+            id: `PID-${r.id}`,
+            disease: diseaseLabel,
+            band: r.risk_band as any,
+            score: `${(r.probability * 100).toFixed(1)}%`,
+            date: formattedDate,
+            factors: [], // No factors stored in basic DB records
+          };
+        });
+        setHistoryItems(items);
+      })
+      .catch((err) => {
+        console.error("Failed to load history from backend:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
+
+  const filtered = historyItems.filter((item) => {
     const matchesQuery =
       item.disease.toLowerCase().includes(query.toLowerCase());
     const matchesBand = !bandFilter || item.band === bandFilter;
@@ -166,7 +133,7 @@ export default function History() {
           </table>
         </div>
         <div className="px-5 py-3 border-t border-gray-100 text-xs font-medium text-gray-500 bg-gray-50/50">
-          Showing {filtered.length} of {MOCK.length} records
+          Showing {filtered.length} of {historyItems.length} records
         </div>
       </div>
     </div>

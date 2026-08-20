@@ -101,6 +101,7 @@ class PredictionRecordOut(BaseModel):
     risk_band: str
     threshold: float
     created_at: Optional[str] = None
+    user_id: Optional[str] = None
 
 
 class PredictionListResponse(BaseModel):

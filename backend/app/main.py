@@ -68,6 +68,11 @@ async def lifespan(app: FastAPI):
     # production schema migrations; create_all is sufficient for the MVP.)
     try:
         Base.metadata.create_all(bind=engine)
+        # Programmatically ensure user_id column exists for live database updates
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            conn.execute(text("ALTER TABLE predictions ADD COLUMN IF NOT EXISTS user_id VARCHAR(64)"))
+            conn.commit()
         logger.info("Database tables verified/created.")
     except Exception as exc:
         logger.warning("Database not available at startup: %s", exc)

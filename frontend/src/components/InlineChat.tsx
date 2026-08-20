@@ -66,9 +66,13 @@ export default function InlineChat({ context, startCollapsed = true }: Props) {
     setIsTyping(true);
 
     try {
+      const token = localStorage.getItem("access_token");
       const response = await fetch("/api/v1/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify({ message: userMessage, context }),
       });
 

@@ -29,6 +29,9 @@ class PredictionRecord(Base):
     risk_band: Mapped[str] = mapped_column(String(16), nullable=False)
     threshold: Mapped[float] = mapped_column(Float, nullable=False)
 
+    # Persistent user association
+    user_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False, index=True
     )
@@ -42,5 +45,6 @@ class PredictionRecord(Base):
             "probability": round(self.probability, 4),
             "risk_band": self.risk_band,
             "threshold": round(self.threshold, 4),
+            "user_id": self.user_id,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

@@ -4,6 +4,14 @@ import type { ModelInfo, NotReadyDetail, PredictionResponse } from "../types";
 // proxy routes them to the FastAPI backend.
 const API_V1 = "/api/v1";
 
+function getAuthHeaders(headers: Record<string, string> = {}): Record<string, string> {
+  const token = localStorage.getItem("access_token");
+  return {
+    ...headers,
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
 export class NotReadyError extends Error {
   detail: NotReadyDetail;
   constructor(detail: NotReadyDetail) {
@@ -44,7 +52,9 @@ export async function getHealth(): Promise<{ status: string; database: string }>
 }
 
 export async function getModels(): Promise<ModelInfo[]> {
-  const res = await fetch(`${API_V1}/models`);
+  const res = await fetch(`${API_V1}/models`, {
+    headers: getAuthHeaders(),
+  });
   return parseResponse<ModelInfo[]>(res);
 }
 
@@ -54,14 +64,16 @@ export async function predict(
 ): Promise<PredictionResponse> {
   const res = await fetch(`${API_V1}/predict/${disease}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: getAuthHeaders({ "Content-Type": "application/json" }),
     body: JSON.stringify(payload),
   });
   return parseResponse<PredictionResponse>(res);
 }
 
 export async function getStatistics(disease: string): Promise<any> {
-  const res = await fetch(`${API_V1}/statistics/${disease}`);
+  const res = await fetch(`${API_V1}/statistics/${disease}`, {
+    headers: getAuthHeaders(),
+  });
   return parseResponse<any>(res);
 }
 
@@ -69,6 +81,8 @@ export async function getPredictions(
   disease?: string
 ): Promise<{ items: any[]; total: number }> {
   const qs = disease ? `?disease=${disease}` : "";
-  const res = await fetch(`${API_V1}/predictions${qs}`);
+  const res = await fetch(`${API_V1}/predictions${qs}`, {
+    headers: getAuthHeaders(),
+  });
   return parseResponse(res);
 }
