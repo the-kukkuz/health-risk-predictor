@@ -26,7 +26,8 @@ npm-debug.log*
 
 # Model artifacts can be large; uncomment to ignore them in VCS.
 #models/diabetes/*.joblib
-models/heart/v1.0.0/*.joblib
+models/heart/v1.0.0/.joblib
+
 
 # TypeScript build artifacts
 *.tsbuildinfo
