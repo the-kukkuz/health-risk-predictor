@@ -56,7 +56,7 @@ resource "azurerm_postgresql_flexible_server" "main" {
   location            = azurerm_resource_group.main.location
 
   version = "16"
-  zone = "1"
+  zone    = "1"
 
   administrator_login    = var.postgres_admin_username
   administrator_password = var.postgres_admin_password
@@ -113,6 +113,21 @@ resource "azurerm_container_app" "backend" {
     value = "postgresql+psycopg2://${var.postgres_admin_username}:${var.postgres_admin_password}@${azurerm_postgresql_flexible_server.main.fqdn}:5432/${var.postgres_database_name}"
   }
 
+  secret {
+    name  = "supabase-url"
+    value = var.supabase_url
+  }
+
+  secret {
+    name  = "supabase-anon-key"
+    value = var.supabase_anon_key
+  }
+
+  secret {
+    name  = "supabase-jwt-secret"
+    value = var.supabase_jwt_secret
+  }
+
   registry {
     server               = azurerm_container_registry.main.login_server
     username             = azurerm_container_registry.main.admin_username
@@ -136,7 +151,7 @@ resource "azurerm_container_app" "backend" {
 
     container {
       name   = "health-risk-backend"
-      image  = "${azurerm_container_registry.main.login_server}/health-risk-backend:1.0.0"
+      image  = "${azurerm_container_registry.main.login_server}/health-risk-backend:1.1.0"
       cpu    = 0.5
       memory = "1Gi"
 
@@ -164,6 +179,22 @@ resource "azurerm_container_app" "backend" {
         name  = "HEART_MODEL_DIR"
         value = "/models/heart/v1.0.0"
       }
+
+      env {
+        name        = "SUPABASE_URL"
+        secret_name = "supabase-url"
+      }
+
+      env {
+        name        = "SUPABASE_ANON_KEY"
+        secret_name = "supabase-anon-key"
+      }
+
+      env {
+        name        = "SUPABASE_JWT_SECRET"
+        secret_name = "supabase-jwt-secret"
+      }
+
     }
   }
 }
