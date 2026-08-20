@@ -24,6 +24,7 @@ from app.api.routes import (
     statistics as statistics_route,
     auth as auth_route,
     users as users_route,
+    chat as chat_route,
 )
 from app.core.config import get_settings
 from app.db.session import Base, engine
@@ -104,6 +105,7 @@ app.include_router(statistics_route.router)
 app.include_router(predictions_route.router)
 app.include_router(auth_route.router)
 app.include_router(users_route.router)
+app.include_router(chat_route.router)
 
 
 @app.get("/", tags=["root"])
