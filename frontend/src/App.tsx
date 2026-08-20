@@ -56,13 +56,6 @@ function Sidebar() {
           </NavLink>
         ))}
       </nav>
-
-      <div className="p-4 border-t border-outline-variant/50">
-        <button className="w-full flex items-center justify-center gap-2 p-2.5 bg-surface-container-highest text-primary text-label-md rounded-lg hover:bg-surface-variant transition">
-          <Icon name="trending_up" className="text-[16px]" />
-          Upgrade Analytics
-        </button>
-      </div>
     </aside>
   );
 }
@@ -157,24 +150,30 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function LandingOrApp() {
+  const { isAuthenticated } = useAuth();
+  return isAuthenticated ? <AppShell /> : <LandingPage />;
+}
+
 export default function App() {
   return (
     <AuthProvider>
       <Routes>
-        {/* Landing page — shown only when not authenticated */}
-        <Route path="/" element={<LandingPage />} />
+        {/* Public routes — no auth required */}
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/terms" element={<TermsOfService />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
-        {/* Protected app routes — require authentication */}
-        { /* <Route path="/analysis" element={<Analysis />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/history" element={<History />} /> */}
-        <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
-        <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-        <Route path="/history" element={<ProtectedRoute><History /></ProtectedRoute>} /> 
+
+        {/* Root route: LandingPage when not authenticated, AppShell when authenticated */}
+        <Route path="/" element={<LandingOrApp />}>
+          {/* Authenticated routes — wrapped in AppShell (sidebar + topbar + footer) */}
+          <Route path="/" element={<Home />} />
+          <Route path="/analysis" element={<Analysis />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/history" element={<History />} />
+        </Route>
       </Routes>
     </AuthProvider>
   );

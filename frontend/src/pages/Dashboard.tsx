@@ -42,8 +42,8 @@ export default function Dashboard() {
         <TabButton active={tab === "platform"} onClick={() => setTab("platform")}>
           <Icon name="dashboard" className="text-[18px]" /> Platform Analytics
         </TabButton>
-        <TabButton active={tab === "model"} onClick={() => setTab("model")}>
-          <Icon name="insights" className="text-[18px]" /> Model Analytics
+          <TabButton active={tab === "model"} onClick={() => setTab("model")}>
+            <Icon name="bar_chart" className="text-[18px]" /> Model Analytics
         </TabButton>
       </div>
 
@@ -116,14 +116,14 @@ function PlatformAnalytics({
         <h3 className="text-headline-sm text-on-surface mb-4">Assessments by Age Group</h3>
         <div className="flex items-end gap-3 h-48">
           {[
-            { label: "18-30", h: "30%" },
-            { label: "31-40", h: "50%" },
-            { label: "41-50", h: "80%" },
-            { label: "51-60", h: "65%" },
-            { label: "60+", h: "90%" },
+            { label: "18-30", h: 30 },
+            { label: "31-40", h: 50 },
+            { label: "41-50", h: 80 },
+            { label: "51-60", h: 65 },
+            { label: "60+", h: 90 },
           ].map((b) => (
             <div key={b.label} className="flex-1 flex flex-col items-center gap-2">
-              <div className="w-full bg-primary/40 rounded-t" style={{ height: b.h }} />
+              <div className="w-full bg-primary/40 rounded-t" style={{ height: `${b.h}%` }} />
               <span className="text-caption text-on-surface-variant">{b.label}</span>
             </div>
           ))}

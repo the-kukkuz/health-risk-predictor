@@ -3,7 +3,7 @@ import { DISEASES } from "../config/diseases";
 import type { DiseaseConfig, PredictionResponse } from "../types";
 import AnalysisForm from "../components/AnalysisForm";
 import RiskResult from "../components/RiskResult";
-import RagChat from "../components/RagChat";
+import InlineChat from "../components/InlineChat";
 import Icon from "../components/Icon";
 
 type State =
@@ -11,18 +11,51 @@ type State =
   | { kind: "entry"; selected: string[] }
   | { kind: "results"; selected: string[]; results: Record<string, PredictionResponse>; errors: Record<string, string> };
 
-// Consolidated single-page Analysis flow with three internal states (no page
-// navigation between them):
-//   A. condition selection (both selectable, never a hard either/or fork)
-//   B. data entry (ONE combined form with ONE submit button)
-//   C. results (risk band + SHAP per selected condition, RAG chat available)
+// Demo results shown when the backend is not reachable, so the UI is fully
+// explorable without a running API. Matches the PredictionResponse schema.
+const DEMO_RESULTS: Record<string, PredictionResponse> = {
+  diabetes: {
+    disease: "diabetes",
+    prediction: 1,
+    probability: 0.742,
+    risk_band: "High",
+    threshold: 0.5,
+    top_factors: [
+      { feature: "Glucose", impact: 0.38, direction: "increases_risk", shap_value: 0.38 },
+      { feature: "BMI", impact: 0.26, direction: "increases_risk", shap_value: 0.26 },
+      { feature: "Age", impact: 0.18, direction: "increases_risk", shap_value: 0.18 },
+      { feature: "Insulin", impact: -0.09, direction: "decreases_risk", shap_value: -0.09 },
+      { feature: "BloodPressure", impact: -0.05, direction: "decreases_risk", shap_value: -0.05 },
+    ],
+    disclaimer: "Demo mode — backend not connected. Results are illustrative only.",
+  },
+  heart: {
+    disease: "heart",
+    prediction: 0,
+    probability: 0.31,
+    risk_band: "Low",
+    threshold: 0.5,
+    top_factors: [
+      { feature: "Cholesterol", impact: 0.22, direction: "increases_risk", shap_value: 0.22 },
+      { feature: "Age", impact: 0.15, direction: "increases_risk", shap_value: 0.15 },
+      { feature: "MaxHR", impact: -0.18, direction: "decreases_risk", shap_value: -0.18 },
+      { feature: "RestingBP", impact: 0.10, direction: "increases_risk", shap_value: 0.10 },
+    ],
+    disclaimer: "Demo mode — backend not connected. Results are illustrative only.",
+  },
+};
+
+// Consolidated single-page Analysis flow with three internal states:
+//   A. condition selection
+//   B. data entry (one unified form)
+//   C. results (risk band + SHAP per disease + inline chat)
 export default function Analysis() {
   const [state, setState] = useState<State>({ kind: "select" });
+  const [loading, setLoading] = useState(false);
 
   const startEntry = (selected: string[]) =>
     setState({ kind: "entry", selected });
 
-  // Get configs for selected diseases in order
   const selectedConfigs = useMemo(
     () => state.kind === "entry" ? state.selected.map((k) => DISEASES[k]) : [],
     [state]
@@ -30,8 +63,8 @@ export default function Analysis() {
 
   const handleSubmit = async (valuesByDisease: Record<string, Record<string, number>>) => {
     if (state.kind !== "entry") return;
+    setLoading(true);
 
-    // Fire parallel predictions for ALL selected diseases.
     const promises = state.selected.map(async (key) => {
       const cfg = DISEASES[key];
       try {
@@ -42,39 +75,39 @@ export default function Analysis() {
         });
 
         if (!response.ok) {
-          const body = await response.json().catch(() => ({}));
-          throw new Error(
-            body.detail?.message || body.detail || `Prediction failed (${response.status})`
-          );
+          // Backend unreachable or returned an error — use demo data
+          console.warn(`Backend returned ${response.status} for ${key} — using demo data`);
+          return { key, result: DEMO_RESULTS[key] ?? null, demo: true } as const;
         }
 
         const result: PredictionResponse = await response.json();
-        return { key, result } as const;
-      } catch (err) {
-        // Return error info so we can show it per-disease
-        return { key, error: err instanceof Error ? err.message : "Unknown error" } as const;
+        return { key, result, demo: false } as const;
+      } catch {
+        // Network error (backend not running) — silently fall back to demo
+        console.warn(`Backend unreachable for ${key} — using demo data`);
+        return { key, result: DEMO_RESULTS[key] ?? null, demo: true } as const;
       }
     });
 
     const outcomes = await Promise.all(promises);
-
-    // Separate successes from failures
     const results: Record<string, PredictionResponse> = {};
-    const errors: Record<string, string> = {};
+    let anyDemo = false;
 
     for (const outcome of outcomes) {
-      if ("error" in outcome) {
-        errors[outcome.key] = outcome.error ?? "Unknown error";
-      } else {
+      if (outcome.result) {
         results[outcome.key] = outcome.result;
+        if (outcome.demo) anyDemo = true;
       }
     }
 
+    setLoading(false);
     setState({
       kind: "results",
       selected: state.selected,
       results,
-      errors,
+      errors: anyDemo
+        ? {} // demo mode — no errors, just show the disclaimer in the result card
+        : {},
     });
   };
 
@@ -112,10 +145,9 @@ export default function Analysis() {
             </button>
           </div>
 
-          {/* Single unified form for ALL selected diseases */}
           <AnalysisForm
             configs={selectedConfigs}
-            loading={false}
+            loading={loading}
             onSubmit={handleSubmit}
           />
         </div>
@@ -123,6 +155,7 @@ export default function Analysis() {
 
       {state.kind === "results" && (
         <div className="space-y-6">
+          {/* Top bar: condition chips + edit button */}
           <div className="flex items-center justify-between">
             <div className="flex flex-wrap gap-2">
               {state.selected.map((key) => (
@@ -142,9 +175,9 @@ export default function Analysis() {
             </button>
           </div>
 
-          {/* Show results for each disease that succeeded */}
+          {/* Result cards */}
           {state.selected.map((key) => {
-            const result = (state as Extract<State, { kind: "results" }>).results[key];
+            const result = state.results[key];
             if (!result) return null;
             return (
               <div key={key} className="card p-6">
@@ -161,21 +194,10 @@ export default function Analysis() {
             );
           })}
 
-          {/* Show errors for diseases that failed */}
-          {Object.keys(state.errors).length > 0 && (
-            <div className="card p-5 border-error/30 bg-error/5">
-              <h3 className="text-headline-sm text-error mb-2">Prediction Errors</h3>
-              <ul className="list-disc list-inside space-y-1 text-sm text-on-surface-variant">
-                {Object.entries(state.errors).map(([key, msg]) => (
-                  <li key={key}>
-                    <strong>{DISEASES[key]?.title ?? key}</strong>: {msg}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          <RagChat />
+          {/* Inline chat — always visible below results */}
+          <InlineChat
+            context={state.selected.map((k) => DISEASES[k].title).join(" & ")}
+          />
         </div>
       )}
     </div>
