@@ -150,17 +150,11 @@ export default function InlineChat({ context, startCollapsed = true }: Props) {
                 <Icon name="smart_toy" className="text-primary text-[14px]" />
               </div>
             )}
-           <div
-  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+            <div
+  className={`max-w-[82%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
     m.role === "user"
       ? "bg-[#1d4ed8] text-white rounded-br-sm"
-      : "bg-surface-container-lowest border border-outline-variant text-on-surface rounded-bl-sm shadow-card " +
-        "prose prose-sm max-w-none " +
-        "prose-p:my-1.5 prose-p:leading-relaxed " +
-        "prose-ul:my-2 prose-ul:list-disc prose-ul:pl-5 " +
-        "prose-li:my-0.5 " +
-        "prose-h3:text-xs prose-h3:font-bold prose-h3:uppercase prose-h3:tracking-wider prose-h3:text-on-surface-variant prose-h3:mt-3 prose-h3:mb-1 " +
-        "prose-em:text-xs prose-em:text-on-surface-variant/80 prose-em:block prose-em:mt-2 prose-em:border-t prose-em:border-outline-variant/40 prose-em:pt-2"
+      : "bg-surface-container-lowest border border-outline-variant text-on-surface rounded-bl-sm shadow-card prose prose-sm max-w-none prose-ul:list-disc prose-ul:pl-4 prose-p:my-1"
   }`}
 >
   {m.role === "user" ? (

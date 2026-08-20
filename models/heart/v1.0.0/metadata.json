@@ -24,7 +24,7 @@
     "ca",
     "thal"
   ],
-  "training_date": "2026-08-20 22:22:16",
+  "training_date": "2026-08-21 00:52:31",
   "python_version": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
   "sklearn_version": "1.9.0",
   "random_state": 42,

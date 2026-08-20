@@ -59,5 +59,23 @@ variable "postgres_admin_password" {
 variable "container_image" {
   description = "Container image deployed to Azure Container Apps"
   type        = string
-  default     = "health-risk-backend:1.0.0"
+  default     = "health-risk-backend:1.1.0"
+}
+
+variable "supabase_url" {
+  description = "Supabase project URL"
+  type        = string
+  sensitive   = true
+}
+
+variable "supabase_anon_key" {
+  description = "Supabase anonymous key"
+  type        = string
+  sensitive   = true
+}
+
+variable "supabase_jwt_secret" {
+  description = "Supabase JWT secret"
+  type        = string
+  sensitive   = true
 }
