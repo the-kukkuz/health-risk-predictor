@@ -89,9 +89,11 @@ class RAGService:
 
     def normalize_disease(self, disease: str) -> str:
         """
-        Convert the disease returned by the prediction backend or frontend input
-        into the exact disease value stored in Qdrant.
+        Convert the disease returned by the prediction backend
+        or frontend input into the exact disease value stored
+        in Qdrant.
         """
+
         if not disease:
             raise ValueError(
                 "Prediction result or context does not contain a disease."
@@ -99,8 +101,8 @@ class RAGService:
 
         raw_disease = str(disease).lower().strip()
 
-        # Exact match alias dictionary
         disease_aliases = {
+
             # Diabetes
             "diabetes": "diabetes",
             "diabetic": "diabetes",
@@ -117,22 +119,27 @@ class RAGService:
             "cardiac": "heart",
         }
 
-        # 1. Try exact dictionary match
+        # Exact match
         normalized = disease_aliases.get(raw_disease)
+
         if normalized:
             return normalized
 
-        # 2. Substring fallback matching for descriptive inputs
+        # Substring fallback
         if "diabet" in raw_disease:
             return "diabetes"
-        if any(term in raw_disease for term in ["heart", "cardio", "cardiac"]):
+
+        if any(
+            term in raw_disease
+            for term in ["heart", "cardio", "cardiac"]
+        ):
             return "heart"
 
-        # 3. If still unmatched, raise ValueError
         raise ValueError(
-            f"Unsupported disease returned by prediction backend or request: "
-            f"{disease}"
+            f"Unsupported disease returned by prediction "
+            f"backend or request: {disease}"
         )
+
     # =========================================================
     # RETRIEVE DISEASE-SPECIFIC KNOWLEDGE
     # =========================================================
@@ -291,13 +298,18 @@ class RAGService:
         context: Optional[str] = None,
     ) -> str:
         """
-        Answer a general user question using disease-specific
-        knowledge when a disease is provided.
+        Answer a general user question.
+
+        If a disease is provided, retrieval is restricted
+        to that disease.
+
+        Retrieved knowledge is the primary source. If the
+        retrieved information is insufficient, Gemini may
+        supplement the answer using its general knowledge.
         """
 
         # -----------------------------------------------------
-        # If disease is known, restrict retrieval to that
-        # disease.
+        # If disease is known, restrict retrieval
         # -----------------------------------------------------
 
         if disease:
@@ -314,10 +326,11 @@ class RAGService:
 
         else:
 
+            # -------------------------------------------------
             # No disease supplied.
             #
-            # This should only be used for truly general
-            # questions because there is no disease filter.
+            # Used for general questions.
+            # -------------------------------------------------
 
             result = self.gemini.models.embed_content(
                 model="gemini-embedding-2",
@@ -357,16 +370,37 @@ class RAGService:
                     }
                 )
 
+        # -----------------------------------------------------
+        # Format retrieved knowledge
+        # -----------------------------------------------------
+
         reference = self._format_reference(
             chunks
         )
 
+        if not reference.strip():
+
+            reference = (
+                "No relevant information was "
+                "retrieved from the knowledge base."
+            )
+
+        # -----------------------------------------------------
+        # Optional prediction/context information
+        # -----------------------------------------------------
+
         context_text = ""
 
         if context:
+
             context_text = (
-                f"The current context is: {context}\n\n"
+                f"The current context is:\n"
+                f"{context}\n\n"
             )
+
+        # -----------------------------------------------------
+        # Gemini prompt
+        # -----------------------------------------------------
 
         prompt = f"""
 You are a healthcare risk explanation assistant.
@@ -377,38 +411,51 @@ User question:
 
 {message}
 
-Use ONLY the reference information below when
-providing medical context.
+The following information was retrieved from the
+project's medical knowledge base:
 
-Reference information:
+REFERENCE INFORMATION:
 
 {reference}
 
-Requirements:
+Use the retrieved reference information as the
+PRIMARY source for medical information.
 
-Answer the user's question clearly and naturally.
+If the reference information does not contain enough
+information to answer the user's question, you may
+supplement the answer using your general medical
+knowledge.
 
-Do not invent medical information that is not
-present in the reference.
+When using your general medical knowledge:
+
+- Do not contradict the retrieved reference information.
+- Do not fabricate or speculate.
+- Keep the information medically appropriate and relevant.
+- Do not claim that information came from the knowledge
+  base if it did not.
+
+If the retrieved reference information is sufficient,
+prefer it over general knowledge.
 
 Do not provide a medical diagnosis.
 
-If the reference information does not contain
-the answer, clearly say that the available
-knowledge base does not provide enough
-information.
-
-If discussing a prediction, clearly state that
-it is an ML-based decision-support result.
+If discussing a prediction, clearly state that it is
+an ML-based decision-support result.
 
 Do not interpret an ML probability as a clinical
 probability.
 
-Recommend discussing concerning results with
-a healthcare professional.
+Recommend discussing concerning results with a
+healthcare professional.
+
+Answer the user's question clearly and naturally.
 
 Keep the response understandable to a general user.
 """
+
+        # -----------------------------------------------------
+        # Generate response
+        # -----------------------------------------------------
 
         return self._call_gemini_with_retry(
             lambda: self.gemini.models.generate_content(
@@ -501,13 +548,13 @@ Keep the response understandable to a general user.
                 ↓
         Retrieve relevant knowledge
                 ↓
-        Build context
+        Build reference context
                 ↓
         Gemini explanation
         """
 
         # =====================================================
-        # 1. IDENTIFY DISEASE FROM BACKEND OUTPUT
+        # 1. IDENTIFY DISEASE
         # =====================================================
 
         raw_disease = prediction_result.get(
@@ -541,9 +588,7 @@ Keep the response understandable to a general user.
 
             feature = factor["feature"]
 
-            contribution = factor[
-                "contribution"
-            ]
+            contribution = factor["contribution"]
 
             if contribution is not None:
 
@@ -586,7 +631,7 @@ to {disease}.
 """
 
         # =====================================================
-        # 4. RETRIEVE ONLY THE SELECTED DISEASE
+        # 4. RETRIEVE DISEASE-SPECIFIC KNOWLEDGE
         # =====================================================
 
         chunks = self.retrieve(
@@ -659,8 +704,9 @@ Important model factors:
 
 {factor_text}
 
-The following information was retrieved ONLY
-from the knowledge base for {disease}.
+The following information was retrieved from the
+project's medical knowledge base specifically for
+{disease}:
 
 REFERENCE INFORMATION:
 
@@ -670,50 +716,63 @@ Your task is to explain the machine-learning
 prediction to the user in simple and understandable
 language.
 
-IMPORTANT REQUIREMENTS:
+Use the supplied reference information as the
+PRIMARY source for medical context.
+
+If the reference information does not contain enough
+information to explain a model factor or provide
+necessary medical context, you may supplement the
+explanation using your general medical knowledge.
+
+When using general medical knowledge:
+
+- Do not contradict the supplied reference information.
+- Do not fabricate or speculate.
+- Keep the information medically appropriate and relevant.
+- Do not claim that general medical knowledge came from
+  the project's knowledge base.
+
+If the reference information is sufficient, prefer
+using it rather than relying on general knowledge.
 
 Clearly explain what the prediction means.
 
-Mention the prediction, model probability and
-risk band naturally.
+Mention the prediction, model probability and risk band
+naturally.
 
-Explain the important model factors and their
-model contributions when available.
+Explain the important model factors and their model
+contributions when available.
 
-The contribution values describe how the model
-used the factors. They do NOT prove that a factor
-caused the disease.
+The contribution values describe how the ML model used
+the factors. They do NOT prove that a factor caused
+the disease.
 
-Only connect a model factor to medical information
-when that connection is supported by the reference
-information.
+Clearly distinguish between:
 
-Use ONLY the supplied reference information for
-medical claims.
-
-Do not invent medical information.
+1. The machine-learning prediction.
+2. Information retrieved from the knowledge base.
+3. Additional general medical knowledge.
 
 Do not provide a medical diagnosis.
 
-Clearly state that this is an ML-based risk
-prediction or decision-support result.
+Clearly state that this is an ML-based risk prediction
+or decision-support result.
 
-Do not interpret the model probability as a
-clinical probability.
+Do not interpret the model probability as a clinical
+probability.
 
-Recommend discussing concerning results with
-a healthcare professional.
+Recommend discussing concerning results with a
+healthcare professional.
 
-Keep the explanation concise and understandable
-to a general user.
+Keep the explanation concise and understandable to
+a general user.
 
-Write naturally as if you are responding in a
-chatbot.
+Write naturally as if you are responding in a chatbot.
 
 Use clean Markdown formatting.
 
-You may use short paragraphs and bullet points
-where helpful.
+You may use short paragraphs and bullet points where
+helpful.
 
 Do not overcomplicate the explanation.
 
