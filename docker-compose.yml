@@ -19,15 +19,16 @@ services:
 
   backend:
     build:
-      context: ./backend
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: hrp-backend
     depends_on:
       postgres:
         condition: service_healthy
     environment:
       DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-riskapp}:${POSTGRES_PASSWORD:-riskapp}@postgres:5432/${POSTGRES_DB:-healthrisk}
-      MODEL_DIR: /models/diabetes
-      DATA_DIR: /data/diabetes
+      # MODEL_DIR and DATA_DIR are intentionally omitted here; they are set in
+      # the Dockerfile and the image is self-contained (models/data are baked in).
       ENVIRONMENT: ${ENVIRONMENT:-development}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8080,http://localhost:5173}
       SUPABASE_URL: ${SUPABASE_URL}
@@ -36,12 +37,6 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       QDRANT_URL: ${QDRANT_URL}
       QDRANT_API_KEY: ${QDRANT_API_KEY}
-    volumes:
-      # Mount the trained model + data so retraining doesn't require rebuild.
-      - ./models:/models:ro
-      - ./data:/data:ro
-      # Mount the ML helper package used by the backend loader.
-      - ./ml:/ml:ro
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     healthcheck:

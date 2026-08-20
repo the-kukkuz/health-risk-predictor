@@ -1,0 +1,39 @@
+.git/
+.github/
+.idea/
+.vscode/
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.venv/
+**/venv/
+**/*.db
+**/*.log
+
+# Exclude local SQLite test DBs
+backend/test_pytest.db
+backend/test_pytest.db-journal
+
+# Exclude backend test and cache directories
+backend/tests/
+backend/.pytest_cache/
+
+# Exclude frontend files from backend context
+frontend/node_modules/
+frontend/dist/
+frontend/src/
+frontend/public/
+frontend/Dockerfile
+frontend/nginx.conf
+frontend/postcss.config.js
+frontend/tailwind.config.js
+frontend/tsconfig.json
+frontend/vite.config.ts
+
+# Exclude raw science/training data files and notebooks not needed in production
+ml/heart/notebooks/
+ml/heart/data/
+ml/heart/tests/
+ml/diabetes/tests/
