@@ -41,7 +41,7 @@ export default function SignUp() {
     const lastName = nameParts.slice(1).join(" ") || "";
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/auth/signup", {
+      const response = await fetch("/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
