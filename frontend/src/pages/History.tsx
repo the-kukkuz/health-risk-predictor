@@ -42,10 +42,10 @@ function formatDisease(disease_type: string) {
 export default function History() {
   const [records, setRecords]     = useState<PredictionRecord[]>([]);
   const [total, setTotal]         = useState(0);
-  const [loading, setLoading]     = useState(true);
-  const [query, setQuery]         = useState("");
-  const [bandFilter, setBandFilter] = useState("");
-  const [expanded, setExpanded]   = useState<number | null>(null);
+  const [loading, setLoading]       = useState(true);
+  const [diseaseFilter, setDiseaseFilter] = useState("");
+  const [bandFilter, setBandFilter]  = useState("");
+  const [expanded, setExpanded]      = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,11 +72,9 @@ export default function History() {
   // ── Filter ────────────────────────────────────────────────────────────────
 
   const filtered = records.filter((r) => {
-    const matchesQuery = formatDisease(r.disease_type)
-      .toLowerCase()
-      .includes(query.toLowerCase());
-    const matchesBand = !bandFilter || r.risk_band === bandFilter;
-    return matchesQuery && matchesBand;
+    const matchesDisease = !diseaseFilter || r.disease_type === diseaseFilter;
+    const matchesBand    = !bandFilter    || r.risk_band    === bandFilter;
+    return matchesDisease && matchesBand;
   });
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -93,22 +91,19 @@ export default function History() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 max-w-sm">
-          <Icon
-            name="search"
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px] pointer-events-none"
-          />
-          <input
-            className="input-field pl-9"
-            placeholder="Search by disease…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-        </div>
+        <select
+          className="select-field max-w-[200px]"
+          value={diseaseFilter}
+          onChange={(e) => { setDiseaseFilter(e.target.value); setExpanded(null); }}
+        >
+          <option value="">All diseases</option>
+          <option value="diabetes">Diabetes</option>
+          <option value="heart">Heart Disease</option>
+        </select>
         <select
           className="select-field max-w-[180px]"
           value={bandFilter}
-          onChange={(e) => setBandFilter(e.target.value)}
+          onChange={(e) => { setBandFilter(e.target.value); setExpanded(null); }}
         >
           <option value="">All risk bands</option>
           <option value="High">High</option>
