@@ -24,20 +24,10 @@
     "ca",
     "thal"
   ],
-<<<<<<< HEAD
-<<<<<<< HEAD
   "training_date": "2026-08-20 17:12:59",
   "python_version": "3.12.14 (main, Aug 13 2026, 19:41:13) [GCC 14.2.0]",
   "sklearn_version": "1.6.1",
-=======
-  "training_date": "2026-08-20 22:22:16",
-  "python_version": "3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]",
-=======
-  "training_date": "2026-08-20 02:00:56",
-  "python_version": "3.13.13 (tags/v3.13.13:01104ce, Apr  7 2026, 19:25:48) [MSC v.1944 64 bit (AMD64)]",
->>>>>>> e770411b94e67b11bf56deae9ebc2521112ba16f
-  "sklearn_version": "1.9.0",
->>>>>>> 6299fd286e077d66f992b4197766276ba9e6db07
+
   "random_state": 42,
   "cv_folds": 5,
   "test_size": 0.2,
