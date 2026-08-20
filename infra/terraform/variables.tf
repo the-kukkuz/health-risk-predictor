@@ -59,7 +59,7 @@ variable "postgres_admin_password" {
 variable "container_image" {
   description = "Container image deployed to Azure Container Apps"
   type        = string
-  default     = "health-risk-backend:1.1.0"
+  default     = "health-risk-backend:1.2.0"
 }
 
 variable "supabase_url" {
@@ -76,6 +76,28 @@ variable "supabase_anon_key" {
 
 variable "supabase_jwt_secret" {
   description = "Supabase JWT secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "cors_origins" {
+  description = "Allowed frontend origins"
+  type        = string
+}
+
+variable "gemini_api_key" {
+  description = "Google Gemini API Key for Embeddings and Chat"
+  type        = string
+  sensitive   = true
+}
+
+variable "qdrant_url" {
+  description = "Qdrant Cloud URL"
+  type        = string
+}
+
+variable "qdrant_api_key" {
+  description = "Qdrant Cloud API Key"
   type        = string
   sensitive   = true
 }
