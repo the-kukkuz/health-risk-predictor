@@ -252,19 +252,7 @@ cd frontend && npm test
 ```
 
 ---
-
-## Kubernetes
-
-Simple manifests for a deployment target are in `k8s/`:
-
-```bash
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/secrets.yaml
-kubectl apply -f k8s/postgres.yaml
-kubectl apply -f k8s/backend.yaml
-kubectl apply -f k8s/frontend.yaml
-```
+## Deployment & Production Readiness
 
 * The backend has **readiness and liveness probes** on `/health`.
 * Build & push `health-risk/backend:latest` and `health-risk/frontend:latest`
